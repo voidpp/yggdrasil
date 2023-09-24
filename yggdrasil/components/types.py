@@ -1,0 +1,2 @@
+class RequestScopeKeys:
+    CONTEXT = "CONTEXT"
