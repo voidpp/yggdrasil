@@ -2,7 +2,7 @@ from graphene import Field, ObjectType, ResolveInfo
 from graphql import FieldNode
 from graphql.pyutils.convert_case import camel_to_snake
 
-from yggdrasil.components.injection_middleware import RequestContext
+from yggdrasil.components.request_context import RequestContext
 from yggdrasil.components.types import RequestScopeKeys
 
 

@@ -77,9 +77,10 @@ def create_class_property_dict(
         description = None
         required = False
 
-        if field := model.__fields__.get(property_name):
-            description = field.field_info.description
-            required = field.required
+        if field := model.model_fields.get(property_name):
+            description = field.description
+            # required = field.require
+            required = False
 
         if type_ in _TYPE_MAP_SCALARS:
             properties[property_name] = _TYPE_MAP_SCALARS[type_](required=required, description=description)

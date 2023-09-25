@@ -1,6 +1,7 @@
 from graphene import Field, ObjectType, ResolveInfo, String
 from starlette.requests import Request
 
+from yggdrasil.api.nodes.who_am_i import WhoAmINode
 from yggdrasil.components.tools import app_version
 
 
@@ -17,3 +18,5 @@ class Query(ObjectType):
     ping = Field(String, resolver=ping)
 
     version = Field(String, resolver=version)
+
+    who_am_i = WhoAmINode.field()

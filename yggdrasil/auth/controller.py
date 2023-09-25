@@ -7,7 +7,7 @@ from starlette.responses import RedirectResponse
 from starlette.routing import Route
 
 from yggdrasil.components.app_config import AppConfig
-from yggdrasil.components.injection_middleware import RequestContext
+from yggdrasil.components.request_context import RequestContext
 from yggdrasil.components.types import RequestScopeKeys
 from yggdrasil.components.user_info import UserInfo
 
@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 class AuthController:
     REDIRECT_ROUTE_NAME = "redirect"
+    SESSION_USER_KEY = "user"
 
     def __init__(self, config: AppConfig):
         self._config = config
@@ -50,20 +51,20 @@ class AuthController:
     async def redirect(self, request: Request):
         client = self._get_client(request)
         token = await client.authorize_access_token(request)
-
         user_info = UserInfo(**token["userinfo"])
-
         context: RequestContext = request.scope[RequestScopeKeys.CONTEXT]
         await user_info.store(context.db)
-
-        request.session["user"] = user_info.model_dump()
-
+        request.session[self.SESSION_USER_KEY] = user_info.model_dump()
         return RedirectResponse("/")
 
     async def logout(self, request: Request):
-        if "user" in request.session:
-            del request.session["user"]
+        if self.SESSION_USER_KEY in request.session:
+            del request.session[self.SESSION_USER_KEY]
         return RedirectResponse("/")
+
+    def get_user(self, request: Request) -> UserInfo | None:
+        data = request.session.get(self.SESSION_USER_KEY)
+        return UserInfo(**data) if data else None
 
     def get_routes(self):
         return [

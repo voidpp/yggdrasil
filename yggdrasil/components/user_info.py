@@ -25,13 +25,13 @@ class UserInfo(BaseModel):
         async with db.session() as session:
             user_data = (await session.execute(select(user).where(user.c.sub == self.sub))).first()
 
+            model_data = self.model_dump(exclude_none=True)
+
             if user_data:
-                await session.execute(update(user).where(user.c.id == user_data.id).values(**self.model_dump()))
+                await session.execute(update(user).where(user.c.id == user_data.id).values(**model_data))
                 self.id = user_data.id
             else:
-                result = await session.execute(
-                    insert(user).values(**self.model_dump(exclude_none=True)).returning(user.c.id)
-                )
+                result = await session.execute(insert(user).values(**model_data).returning(user.c.id))
                 self.id = result.scalar()
 
             await session.commit()

@@ -1,13 +1,4 @@
-from dataclasses import dataclass
-
 from starlette.types import ASGIApp, Scope, Receive, Send
-
-from yggdrasil.components.database import Database
-
-
-@dataclass
-class RequestContext:
-    db: Database
 
 
 class InjectionMiddleware:

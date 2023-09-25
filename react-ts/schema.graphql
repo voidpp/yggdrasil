@@ -1,0 +1,15 @@
+type Query {
+  ping: String
+  version: String
+  whoAmI: UserInfo
+}
+
+type UserInfo {
+  sub: String
+  email: String
+  givenName: String
+  familyName: String
+  picture: String
+  locale: String
+  id: Int
+}

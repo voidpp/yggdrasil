@@ -9,11 +9,11 @@ import orjson
 from graphene import Field, InputObjectType, ResolveInfo
 from graphene.utils.orderedtype import OrderedType
 from pydantic import BaseModel
-
+from starlette.requests import Request
 
 from .pydantic import create_class_property_dict
 from .tools import get_field_name_list, get_request_context
-from ..injection_middleware import RequestContext
+from ..request_context import RequestContext
 
 InputType = TypeVar("InputType")
 
@@ -81,6 +81,10 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
     @property
     def request_context(self) -> RequestContext:
         return get_request_context(self._info)
+
+    @property
+    def http_request(self) -> Request:
+        return self._info.context["request"]
 
     @property
     def args(self) -> InputType:
