@@ -6,7 +6,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from yggdrasil.components.app_config import load_app_config
-from yggdrasil.db_models import meta
+from yggdrasil.db_tables import meta
 from yggdrasil.components.env import environment
 
 from alembic import context

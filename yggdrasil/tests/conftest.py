@@ -6,7 +6,7 @@ from testing.postgresql import Postgresql
 
 
 from yggdrasil.components.database import Database
-from yggdrasil.db_models import meta
+from yggdrasil.db_tables import meta
 
 
 @pytest_asyncio.fixture()

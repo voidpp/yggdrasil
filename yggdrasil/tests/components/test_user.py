@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import select
 
 from yggdrasil.components.user_info import UserInfo
-from yggdrasil.db_models import user
+from yggdrasil.db_tables import user
 
 
 @pytest.mark.asyncio

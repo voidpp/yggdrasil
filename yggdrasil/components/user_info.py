@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from sqlalchemy import select, update, insert
 
 from yggdrasil.components.database import Database
-from yggdrasil.db_models import user
+from yggdrasil.db_tables import user
 
 
 class UserInfo(BaseModel):

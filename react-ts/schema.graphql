@@ -1,15 +1,60 @@
 type Query {
   ping: String
   version: String
+  authClients: [AuthClient!]
   whoAmI: UserInfo
+  sections: [Section!]!
+  links: [Link!]!
+}
+
+type AuthClient {
+  name: String!
+  icon: String!
 }
 
 type UserInfo {
-  sub: String
-  email: String
-  givenName: String
-  familyName: String
-  picture: String
-  locale: String
+  sub: String!
+  email: String!
+  givenName: String!
+  familyName: String!
+  picture: String!
+  locale: String!
   id: Int
+}
+
+type Section {
+  id: Int!
+  name: String!
+  rank: Int!
+}
+
+type Link {
+  id: Int!
+  title: String!
+  url: String!
+  favicon: String!
+  sectionId: Int!
+  rank: Int!
+}
+
+type Mutation {
+  saveSection(section: SectionInput): Section
+  saveLink(link: LinkInput): Link
+  deleteSection(id: Int!): Boolean
+  deleteLink(id: Int!): Boolean
+}
+
+input SectionInput {
+  id: Int
+  name: String!
+  rank: Int!
+}
+
+input LinkInput {
+  id: Int
+  title: String!
+  url: String!
+  favicon: String!
+  sectionId: Int!
+  rank: Int!
 }

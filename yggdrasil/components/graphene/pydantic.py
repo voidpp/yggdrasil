@@ -3,7 +3,7 @@ import inspect
 import uuid
 from datetime import date, datetime
 from ipaddress import IPv4Address
-from typing import Tuple, Type, Union, get_args, get_origin
+from typing import Tuple, Type, Union, get_args, get_origin, Annotated
 
 from graphene import (
     UUID,
@@ -79,8 +79,7 @@ def create_class_property_dict(
 
         if field := model.model_fields.get(property_name):
             description = field.description
-            # required = field.require
-            required = False
+            required = field.is_required()
 
         if type_ in _TYPE_MAP_SCALARS:
             properties[property_name] = _TYPE_MAP_SCALARS[type_](required=required, description=description)

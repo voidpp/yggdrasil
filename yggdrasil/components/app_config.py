@@ -8,6 +8,7 @@ class OAuthClient(BaseModel):
     id: str
     secret: str
     metadata_url: str
+    icon: str
 
 
 class AppConfig(BaseModel):

@@ -1,8 +1,8 @@
 from invoke import Collection
 
-from tasks import api, top
+from tasks import api, top, ui
 
 ns = Collection.from_module(top)
 
-api_collection = Collection.from_module(api)
-ns.add_collection(api_collection)
+ns.add_collection(Collection.from_module(api))
+ns.add_collection(Collection.from_module(ui))

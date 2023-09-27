@@ -1,13 +1,13 @@
-import "./App.css";
-import { useWhoAmIQuery } from "./graphql-types-and-hooks.tsx";
+import { Login } from "./Login.tsx";
+import { Board } from "./Board.tsx";
+import { useCurrentUser } from "./currentUser.tsx";
 
 export const App = () => {
-  const { data } = useWhoAmIQuery();
+  const { currentUser } = useCurrentUser();
 
-  if (data?.whoAmI === undefined) return null;
+  if (currentUser === undefined) return null;
 
-  if (data.whoAmI === null)
-    return <a href="/auth/login/google">google login</a>;
+  if (currentUser === null) return <Login />;
 
-  return <a href="/auth/logout">logout</a>;
+  return <Board />;
 };

@@ -9,4 +9,4 @@ class WhoAmINode(NodeBase):
     )
 
     async def resolve(self):
-        return self.request_context.auth.get_user(self.http_request)
+        return self.user_info

@@ -1,6 +1,6 @@
 import base64
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import timedelta
 from functools import cached_property
 from typing import Generic, Type, TypeVar
@@ -30,10 +30,11 @@ class ValidationError(Exception):
 
 @dataclass
 class NodeConfig:
-    result_type: OrderedType
+    result_type: OrderedType | type
     input_validator: Type[BaseModel] = None
     description: str = None
     cache_expiry_time: timedelta = None
+    field_extra: dict = field(default_factory=dict)
 
 
 class _NodeConfigChecker(ABCMeta):
@@ -83,6 +84,10 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
         return get_request_context(self._info)
 
     @property
+    def user_info(self):
+        return self.request_context.auth.get_user(self.http_request)
+
+    @property
     def http_request(self) -> Request:
         return self._info.context["request"]
 
@@ -92,7 +97,7 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
             raise NoArgumentsDefinedError
         if self._args:
             return self._args
-        self._args = self.config.input_validator.construct(**self._kwargs)
+        self._args = self.config.input_validator(**self._kwargs)
         return self._args
 
     async def validate(self):
@@ -128,4 +133,5 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
             else None,
             resolver=cls._resolve,
             description=cls.config.description,
+            **cls.config.field_extra,
         )

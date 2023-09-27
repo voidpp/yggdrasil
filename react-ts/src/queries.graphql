@@ -1,5 +1,59 @@
 query WhoAmI {
     whoAmI {
+        id
         email
+        familyName
+        givenName
+        locale
+        picture
+        sub
     }
+}
+
+query AuthClients {
+    authClients {
+        name
+        icon
+    }
+}
+
+mutation SaveSection($section: SectionInput!) {
+    saveSection(section: $section) {
+        id
+        name
+        rank
+    }
+}
+
+query Sections {
+    sections {
+        id
+        name
+        rank
+    }
+}
+
+mutation SaveLink($link: LinkInput!) {
+    saveLink(link: $link) {
+        id
+    }
+}
+
+query Links {
+    links {
+        id
+        title
+        url
+        favicon
+        rank
+        sectionId
+    }
+}
+
+mutation DeleteLink($id: Int!) {
+    deleteLink(id: $id)
+}
+
+mutation DeleteSection($id: Int!) {
+    deleteSection(id: $id)
 }

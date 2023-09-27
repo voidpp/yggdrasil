@@ -20,7 +20,8 @@ section = Table(
     meta,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("name", String),
-    Column("user_id", Integer, ForeignKey("user.id")),
+    Column("user_id", Integer, ForeignKey("user.id", ondelete="CASCADE")),
+    Column("rank", Integer),
 )
 
 link = Table(
@@ -30,5 +31,6 @@ link = Table(
     Column("title", String),
     Column("url", String),
     Column("favicon", String),
-    Column("section_id", Integer, ForeignKey("section.id")),
+    Column("section_id", Integer, ForeignKey("section.id", ondelete="CASCADE")),
+    Column("rank", Integer),
 )
