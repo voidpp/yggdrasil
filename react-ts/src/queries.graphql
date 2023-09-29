@@ -39,8 +39,8 @@ mutation SaveLink($link: LinkInput!) {
     }
 }
 
-query Links {
-    links {
+query LinksBySection($sectionId: Int!) {
+    links(sectionId: $sectionId) {
         id
         title
         url
@@ -56,4 +56,12 @@ mutation DeleteLink($id: Int!) {
 
 mutation DeleteSection($id: Int!) {
     deleteSection(id: $id)
+}
+
+mutation SaveSectionsRank($idList: [Int]!) {
+    saveSectionsRanks(sectionIds: $idList)
+}
+
+mutation SaveLinksRank($idList: [Int]!) {
+    saveLinksRanks(linkIds: $idList)
 }

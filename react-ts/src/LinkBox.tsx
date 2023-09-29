@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Link, useDeleteLinkMutation, useSaveLinkMutation } from "./graphql-types-and-hooks.tsx";
+import {
+  Link,
+  LinksBySectionDocument,
+  LinksBySectionQuery,
+  LinksBySectionQueryVariables,
+  useDeleteLinkMutation,
+  useSaveLinkMutation,
+  useSaveLinksRankMutation,
+} from "./graphql-types-and-hooks.tsx";
 import {
   Box,
   Button,
@@ -18,6 +26,9 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useEditMode } from "./editMode.tsx";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { sortDropItems } from "./tools.ts";
+import { useApolloClient } from "@apollo/client";
 
 type LinkFormData = {
   id?: number;
@@ -70,7 +81,15 @@ const SaveLinkFormDialog = ({
             <Controller
               name="favicon"
               control={control}
-              render={({ field }) => <TextField {...field} label="Favicon" size="small" sx={{ mt: 2 }} />}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Favicon"
+                  size="small"
+                  sx={{ mt: 2 }}
+                  helperText="Optional. Leave empty to fetch from the URL"
+                />
+              )}
             />
           </Box>
         </form>
@@ -217,5 +236,58 @@ export const LinkBox = ({ link, refetchLinks }: { link: Link; refetchLinks: () =
       </Box>
       <Box sx={styles.linkTitle}>{link.title}</Box>
     </Box>
+  );
+};
+
+export const LinkBoxList = ({
+  links,
+  refetchLinks,
+  sectionId,
+}: {
+  refetchLinks: () => Promise<unknown>;
+  links: Link[];
+  sectionId: number;
+}) => {
+  const { editMode } = useEditMode();
+  const client = useApolloClient();
+  const [saveLinksRank] = useSaveLinksRankMutation();
+
+  return (
+    <DragDropContext
+      onDragEnd={async (result) => {
+        if (!result.destination) return;
+        const linksCopy = sortDropItems(links, result);
+
+        client.writeQuery<LinksBySectionQuery, LinksBySectionQueryVariables>({
+          query: LinksBySectionDocument,
+          data: { links: linksCopy },
+          variables: { sectionId },
+        });
+        await saveLinksRank({ variables: { idList: linksCopy.map((link) => link.id) } });
+        await refetchLinks();
+      }}
+    >
+      <Droppable droppableId="droppable-link-list" direction="horizontal" isDropDisabled={!editMode}>
+        {(provided) => (
+          <Box {...provided.droppableProps} ref={provided.innerRef} sx={{ display: "flex", alignItems: "center" }}>
+            {links.map((link, index) => (
+              <Draggable key={link.id} draggableId={`link-item-${link.id}`} index={index} isDragDisabled={!editMode}>
+                {(provided) => (
+                  <Box
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={provided.draggableProps.style}
+                  >
+                    <LinkBox link={link} key={link.id} refetchLinks={refetchLinks} />
+                  </Box>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </Box>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
 };

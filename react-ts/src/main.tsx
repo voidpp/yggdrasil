@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./App.tsx";
 import { client } from "./apollo-client.ts";
@@ -19,16 +18,14 @@ const darkTheme = createTheme({
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={darkTheme}>
-        <CssBaseline />
-        <EditModeProvider>
-          <CurrentUserProvider>
-            <App />
-          </CurrentUserProvider>
-        </EditModeProvider>
-      </ThemeProvider>
-    </ApolloProvider>
-  </React.StrictMode>,
+  <ApolloProvider client={client}>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <EditModeProvider>
+        <CurrentUserProvider>
+          <App />
+        </CurrentUserProvider>
+      </EditModeProvider>
+    </ThemeProvider>
+  </ApolloProvider>,
 );

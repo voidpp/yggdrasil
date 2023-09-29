@@ -1,9 +1,8 @@
-import { useLinksQuery, useSectionsQuery } from "./graphql-types-and-hooks.tsx";
+import { useSectionsQuery } from "./graphql-types-and-hooks.tsx";
 import { Box, Button, SxProps, Typography } from "@mui/material";
 import { AddSectionFormButton, SectionList } from "./Section.tsx";
 import { useEditMode } from "./editMode.tsx";
 import { UserMenu } from "./UserMenu.tsx";
-import { useEffect } from "react";
 
 const styles = {
   boardContainer: {
@@ -50,14 +49,9 @@ const EditModeButton = () => {
 
 export const Board = () => {
   const { data: sectionsData, refetch: refetchSections } = useSectionsQuery();
-  const { data: linksData, refetch: refetchLinks } = useLinksQuery();
-  const { editMode, setEditMode } = useEditMode();
+  const { editMode } = useEditMode();
 
   const sections = sectionsData?.sections ?? [];
-
-  useEffect(() => {
-    if (sections.length == 0) setEditMode(true);
-  }, [sections.length, setEditMode]);
 
   return (
     <Box sx={styles.boardContainer}>
@@ -77,12 +71,7 @@ export const Board = () => {
             />
           )}
         </Box>
-        <SectionList
-          sections={sections}
-          links={linksData?.links ?? []}
-          refetchLinks={refetchLinks}
-          refetchSections={refetchSections}
-        />
+        <SectionList sections={sections} refetchSections={refetchSections} />
       </Box>
     </Box>
   );

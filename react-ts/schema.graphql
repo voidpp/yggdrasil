@@ -4,7 +4,7 @@ type Query {
   authClients: [AuthClient!]
   whoAmI: UserInfo
   sections: [Section!]!
-  links: [Link!]!
+  links(sectionId: Int): [Link!]!
 }
 
 type AuthClient {
@@ -42,6 +42,8 @@ type Mutation {
   saveLink(link: LinkInput): Link
   deleteSection(id: Int!): Boolean
   deleteLink(id: Int!): Boolean
+  saveSectionsRanks(sectionIds: [Int]!): Boolean
+  saveLinksRanks(linkIds: [Int]!): Boolean
 }
 
 input SectionInput {
