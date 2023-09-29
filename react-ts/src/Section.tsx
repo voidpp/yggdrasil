@@ -35,16 +35,21 @@ const styles = {
     backgroundColor: "rgba(0,0,0,0.5)",
     p: 2,
     borderRadius: 2,
-    // backdropFilter: "blur(5px)",
     width: "100%",
-    // position: "relative",
-    // "&::before": {
-    //   content: '""',
-    //   backdropFilter: "blur(5px)",
-    //   position: "absolute",
-    //   width: "100%",
-    //   height: "100%",
-    // },
+    position: "relative",
+    // Why is this hacky solution for background blur?
+    // The most stupid bug I've ever seen: https://github.com/atlassian/react-beautiful-dnd/issues/1826
+    "&::before": {
+      borderRadius: 2,
+      top: 0,
+      left: 0,
+      content: '""',
+      backdropFilter: "blur(5px)",
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      zIndex: -1,
+    },
   },
 } satisfies Record<string, SxProps>;
 

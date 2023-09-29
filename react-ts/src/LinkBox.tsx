@@ -139,6 +139,7 @@ const styles = {
     alignItems: "center",
     px: 4,
     py: 2,
+    pb: 1.5,
     borderRadius: 1,
     transition: "background-color 0.2s",
     position: "relative",
