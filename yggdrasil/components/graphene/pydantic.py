@@ -48,6 +48,9 @@ def object_type_from_pydantic(
 ) -> type:
     model_name = name or model.__name__
 
+    if base_type == InputObjectType:
+        model_name += "Input"
+
     type_ = _graphene_type_registry.get(
         model_name,
         type(

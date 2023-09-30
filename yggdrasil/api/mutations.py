@@ -2,6 +2,7 @@ from graphene import ObjectType
 
 from yggdrasil.api.nodes.delete_link import DeleteLinkNode
 from yggdrasil.api.nodes.delete_section import DeleteSectionNode
+from yggdrasil.api.nodes.save_board_settings import SaveBoardSettingsNode
 from yggdrasil.api.nodes.save_link import SaveLinkNode
 from yggdrasil.api.nodes.save_links_ranks import SaveLinksRanksNode
 from yggdrasil.api.nodes.save_section import SaveSectionNode
@@ -17,3 +18,5 @@ class Mutation(ObjectType):
 
     save_sections_ranks = SaveSectionsRanksNode.field()
     save_links_ranks = SaveLinksRanksNode.field()
+
+    save_board_settings = SaveBoardSettingsNode.field()

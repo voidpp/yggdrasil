@@ -244,7 +244,7 @@ export const SectionList = ({
     >
       <Droppable droppableId="droppable-section-list" isDropDisabled={!editMode}>
         {(provided) => (
-          <Box {...provided.droppableProps} ref={provided.innerRef}>
+          <Box {...provided.droppableProps} ref={provided.innerRef} sx={{ width: "100%" }}>
             {sections.map((section, index) => (
               <Draggable
                 key={section.id}

@@ -25,12 +25,14 @@
     "@mui/icons-material": "^5.14.9",
     "@mui/material": "^5.14.10",
     "@types/react-beautiful-dnd": "^13.1.5",
+    "@types/react-helmet": "^6.1.7",
     "graphql": "^16.8.1",
     "prettier": "^3.0.3",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-freeze": "^1.0.3",
+    "react-helmet": "^6.1.0",
     "react-hook-form": "^7.46.2"
   },
   "devDependencies": {

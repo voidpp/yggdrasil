@@ -3,6 +3,7 @@ from sqlalchemy import select, update, insert
 
 from yggdrasil.components.database import Database
 from yggdrasil.db_tables import user
+from yggdrasil.types import BoardBackgroundType
 
 
 class UserInfo(BaseModel):
@@ -31,6 +32,12 @@ class UserInfo(BaseModel):
                 await session.execute(update(user).where(user.c.id == user_data.id).values(**model_data))
                 self.id = user_data.id
             else:
+                model_data.update(
+                    {
+                        "board_background_type": BoardBackgroundType.COLOR,
+                        "board_background_value": "#555555",
+                    }
+                )
                 result = await session.execute(insert(user).values(**model_data).returning(user.c.id))
                 self.id = result.scalar()
 

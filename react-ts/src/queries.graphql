@@ -17,25 +17,11 @@ query AuthClients {
     }
 }
 
-mutation SaveSection($section: SectionInput!) {
-    saveSection(section: $section) {
-        id
-        name
-        rank
-    }
-}
-
 query Sections {
     sections {
         id
         name
         rank
-    }
-}
-
-mutation SaveLink($link: LinkInput!) {
-    saveLink(link: $link) {
-        id
     }
 }
 
@@ -47,6 +33,36 @@ query LinksBySection($sectionId: Int!) {
         favicon
         rank
         sectionId
+    }
+}
+
+query EarthPornImages {
+    earthPornImages {
+        url
+        title
+    }
+}
+
+query BoardSettings {
+    boardSettings {
+        background {
+            type
+            value
+        }
+    }
+}
+
+mutation SaveLink($link: LinkInput!) {
+    saveLink(link: $link) {
+        id
+    }
+}
+
+mutation SaveSection($section: SectionInput!) {
+    saveSection(section: $section) {
+        id
+        name
+        rank
     }
 }
 
@@ -64,4 +80,8 @@ mutation SaveSectionsRank($idList: [Int]!) {
 
 mutation SaveLinksRank($idList: [Int]!) {
     saveLinksRanks(linkIds: $idList)
+}
+
+mutation SaveBoardSettings($settings: BoardSettingsInput!) {
+    saveBoardSettings(boardSettings: $settings)
 }

@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 from sqlalchemy import insert, update
 
-from yggdrasil.types import Link
+from yggdrasil.types import Link as LinkOutput
 from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import link
 
 
-class LinkInput(BaseModel):
+class Link(BaseModel):
     id: int = None
     title: str
     url: str
@@ -17,12 +17,12 @@ class LinkInput(BaseModel):
 
 
 class SaveLinkValidator(BaseModel):
-    link: LinkInput
+    link: Link
 
 
 class SaveLinkNode(NodeBase[SaveLinkValidator]):
     config = NodeConfig(
-        result_type=object_type_from_pydantic(Link),
+        result_type=object_type_from_pydantic(LinkOutput),
         input_validator=SaveLinkValidator,
     )
 
@@ -45,4 +45,4 @@ class SaveLinkNode(NodeBase[SaveLinkValidator]):
                 self.args.link.id = result.scalar()
             await session.commit()
 
-        return Link(**self.args.link.model_dump())
+        return LinkOutput(**self.args.link.model_dump())

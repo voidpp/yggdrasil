@@ -5,6 +5,8 @@ type Query {
   whoAmI: UserInfo
   sections: [Section!]!
   links(sectionId: Int): [Link!]!
+  boardSettings: BoardSettings
+  earthPornImages: [EarthPornImage!]
 }
 
 type AuthClient {
@@ -37,6 +39,27 @@ type Link {
   rank: Int!
 }
 
+type BoardSettings {
+  background: BoardBackground
+}
+
+type BoardBackground {
+  type: BoardBackgroundType!
+  value: String!
+}
+
+"""An enumeration."""
+enum BoardBackgroundType {
+  COLOR
+  IMAGE
+  EARTHPORN
+}
+
+type EarthPornImage {
+  url: String!
+  title: String!
+}
+
 type Mutation {
   saveSection(section: SectionInput): Section
   saveLink(link: LinkInput): Link
@@ -44,6 +67,7 @@ type Mutation {
   deleteLink(id: Int!): Boolean
   saveSectionsRanks(sectionIds: [Int]!): Boolean
   saveLinksRanks(linkIds: [Int]!): Boolean
+  saveBoardSettings(boardSettings: BoardSettingsInput): Boolean
 }
 
 input SectionInput {
@@ -59,4 +83,13 @@ input LinkInput {
   favicon: String!
   sectionId: Int!
   rank: Int!
+}
+
+input BoardSettingsInput {
+  background: BoardBackgroundInput
+}
+
+input BoardBackgroundInput {
+  type: BoardBackgroundType!
+  value: String!
 }

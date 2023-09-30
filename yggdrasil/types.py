@@ -1,3 +1,5 @@
+from enum import Enum
+
 from pydantic import BaseModel
 
 
@@ -14,3 +16,18 @@ class Link(BaseModel):
     favicon: str
     section_id: int
     rank: int
+
+
+class BoardBackgroundType(Enum):
+    COLOR = "COLOR"
+    IMAGE = "IMAGE"
+    EARTHPORN = "EARTHPORN"
+
+
+class BoardBackground(BaseModel):
+    type: BoardBackgroundType
+    value: str
+
+
+class BoardSettings(BaseModel):
+    background: BoardBackground

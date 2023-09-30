@@ -1,6 +1,8 @@
 from graphene import Field, ObjectType, ResolveInfo, String, List, NonNull
 from starlette.requests import Request
 
+from yggdrasil.api.nodes.board_settings import BoardSettingsNode
+from yggdrasil.api.nodes.earth_porn_images import EarthPornImagesNode
 from yggdrasil.api.nodes.links import LinksNode
 from yggdrasil.api.nodes.sections import SectionsNode
 from yggdrasil.api.nodes.who_am_i import WhoAmINode
@@ -34,3 +36,5 @@ class Query(ObjectType):
     who_am_i = WhoAmINode.field()
     sections = SectionsNode.field()
     links = LinksNode.field()
+    board_settings = BoardSettingsNode.field()
+    earth_porn_images = EarthPornImagesNode.field()

@@ -1,4 +1,6 @@
-from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey
+from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, Enum
+
+from yggdrasil.types import BoardBackgroundType
 
 meta = MetaData()
 
@@ -13,6 +15,8 @@ user = Table(
     Column("family_name", String),
     Column("locale", String),
     Column("picture", String),
+    Column("board_background_type", Enum(BoardBackgroundType, native_enum=False)),
+    Column("board_background_value", String),
 )
 
 section = Table(
