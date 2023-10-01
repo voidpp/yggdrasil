@@ -1,17 +1,19 @@
-from pydantic import BaseModel
+from typing import Annotated
+
+from pydantic import BaseModel, HttpUrl, StringConstraints, ValidationError
 from sqlalchemy import insert, update
 
-from yggdrasil.types import Link as LinkOutput
-from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig
+from yggdrasil.api.types import SaveResult
+from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig, NodeValidationError
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import link
 
 
 class Link(BaseModel):
     id: int = None
-    title: str
-    url: str
-    favicon: str
+    title: Annotated[str, StringConstraints(min_length=2)]
+    url: HttpUrl
+    favicon: HttpUrl = None
     section_id: int
     rank: int
 
@@ -22,27 +24,28 @@ class SaveLinkValidator(BaseModel):
 
 class SaveLinkNode(NodeBase[SaveLinkValidator]):
     config = NodeConfig(
-        result_type=object_type_from_pydantic(LinkOutput),
+        result_type=object_type_from_pydantic(SaveResult),
         input_validator=SaveLinkValidator,
     )
 
     async def validate(self):
-        # TODO: check if the section belongs to the current user
-        pass
+        try:
+            assert self.args
+        except ValidationError as e:
+            raise NodeValidationError(SaveResult(errors=e.errors()))
+
+        # TODO: check and test section_id is belongs to user
 
     async def resolve(self):
-        # TODO: auth
-        link_data = self.args.link.model_dump(exclude_unset=True)
+        link_data = self.args.link.model_dump(exclude_unset=True, mode="json")
 
         if self.args.link.id is None:
-            query = insert(link).values(link_data).returning(link.c.id)
+            query = insert(link).values(link_data)
         else:
             query = update(link).where(link.c.id == self.args.link.id).values(link_data)
 
         async with self.request_context.db.session() as session:
-            result = await session.execute(query)
-            if self.args.link.id is None:
-                self.args.link.id = result.scalar()
+            await session.execute(query)
             await session.commit()
 
-        return LinkOutput(**self.args.link.model_dump())
+        return SaveResult()

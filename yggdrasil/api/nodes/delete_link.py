@@ -21,8 +21,6 @@ class DeleteLinkNode(NodeBase[DeleteLinkValidator]):
         pass
 
     async def resolve(self):
-        # TODO: auth
-
         query = delete(link).where(link.c.id == self.args.id)
 
         async with self.request_context.db.session() as session:

@@ -22,6 +22,7 @@ from graphene import (
 )
 from graphene.types.base import BaseType
 from pydantic import BaseModel
+from pydantic_core import Url
 
 VALIDATOR_CLASS_NAME_PREFIX = "Validator"
 
@@ -97,6 +98,9 @@ def create_class_property_dict(
             list_item_class = _create_list_item_class(type_, sub_type)
             properties[property_name] = List(list_item_class, required=required, description=description)
             continue
+
+        if get_origin(type_) == Annotated:
+            type_ = type_.__origin__
 
         type_base = get_base_scalar_type(type_)
         if type_base in _TYPE_MAP_SCALARS:
@@ -191,4 +195,5 @@ _TYPE_MAP_SCALARS = {
     date: Date,
     dict: JSONString,
     IPv4Address: String,
+    Url: String,
 }

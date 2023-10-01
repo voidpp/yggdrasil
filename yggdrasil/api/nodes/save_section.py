@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from sqlalchemy import insert, update
 
-from yggdrasil.types import Section as SectionOutput
+from yggdrasil.api.types import SaveResult
 from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import section
@@ -19,7 +19,7 @@ class SaveSectionValidator(BaseModel):
 
 class SaveSectionNode(NodeBase[SaveSectionValidator]):
     config = NodeConfig(
-        result_type=object_type_from_pydantic(SectionOutput),
+        result_type=object_type_from_pydantic(SaveResult),
         input_validator=SaveSectionValidator,
     )
 
@@ -29,14 +29,12 @@ class SaveSectionNode(NodeBase[SaveSectionValidator]):
         section_data = self.args.section.model_dump(exclude_unset=True)
 
         if self.args.section.id is None:
-            query = insert(section).values({"user_id": self.user_info.id, **section_data}).returning(section.c.id)
+            query = insert(section).values({"user_id": self.user_info.id, **section_data})
         else:
             query = update(section).where(section.c.id == self.args.section.id).values(section_data)
 
         async with self.request_context.db.session() as session:
-            result = await session.execute(query)
-            if self.args.section.id is None:
-                self.args.section.id = result.scalar()
+            await session.execute(query)
             await session.commit()
 
-        return SectionOutput(**self.args.section.model_dump())
+        return SaveResult()

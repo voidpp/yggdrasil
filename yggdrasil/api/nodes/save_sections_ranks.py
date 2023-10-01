@@ -1,8 +1,9 @@
-from graphene import Boolean
 from pydantic import BaseModel
 from sqlalchemy import update
 
+from yggdrasil.api.types import SaveResult
 from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig
+from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import section
 
 
@@ -12,7 +13,7 @@ class SaveSectionsRanksValidator(BaseModel):
 
 class SaveSectionsRanksNode(NodeBase[SaveSectionsRanksValidator]):
     config = NodeConfig(
-        result_type=Boolean,
+        result_type=object_type_from_pydantic(SaveResult),
         input_validator=SaveSectionsRanksValidator,
     )
 
@@ -24,4 +25,4 @@ class SaveSectionsRanksNode(NodeBase[SaveSectionsRanksValidator]):
                 await session.execute(update(section).where(section.c.id == section_id).values({"rank": index}))
             await session.commit()
 
-        return True
+        return SaveResult()

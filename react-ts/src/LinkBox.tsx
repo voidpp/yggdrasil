@@ -50,14 +50,20 @@ const SaveLinkFormDialog = ({
   linkData: LinkFormData;
   onSave: () => void;
 }) => {
-  const { control, handleSubmit, reset } = useForm<LinkFormData>({ defaultValues: linkData });
+  const { control, handleSubmit, reset, setError } = useForm<LinkFormData>({ defaultValues: linkData });
   const [saveLink] = useSaveLinkMutation();
 
   const onSubmit = async (data: LinkFormData) => {
-    await saveLink({ variables: { link: data } });
-    if (!linkData.id) reset();
-    close();
-    onSave();
+    const result = await saveLink({ variables: { link: data } });
+    if (result.data?.saveLink?.errors?.length) {
+      for (const error of result.data.saveLink.errors) {
+        if (error) setError(error.loc[1] as keyof LinkFormData, { message: error.msg });
+      }
+    } else {
+      if (!linkData.id) reset();
+      close();
+      onSave();
+    }
   };
 
   return (
@@ -69,13 +75,31 @@ const SaveLinkFormDialog = ({
             <Controller
               name="title"
               control={control}
-              render={({ field }) => <TextField {...field} label="Title" size="small" sx={{ mt: 2 }} required />}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Title"
+                  size="small"
+                  sx={{ mt: 2 }}
+                  required
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
             />
             <Controller
               name="url"
               control={control}
-              render={({ field }) => (
-                <TextField {...field} label="URL" size="small" sx={{ mt: 2, minWidth: 350 }} required />
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="URL"
+                  size="small"
+                  sx={{ mt: 2, minWidth: 350 }}
+                  required
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
               )}
             />
             <Controller

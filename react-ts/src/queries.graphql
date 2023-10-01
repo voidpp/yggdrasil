@@ -54,15 +54,19 @@ query BoardSettings {
 
 mutation SaveLink($link: LinkInput!) {
     saveLink(link: $link) {
-        id
+        errors {
+            msg
+            loc
+        }
     }
 }
 
 mutation SaveSection($section: SectionInput!) {
     saveSection(section: $section) {
-        id
-        name
-        rank
+        errors {
+            msg
+            loc
+        }
     }
 }
 
@@ -75,13 +79,28 @@ mutation DeleteSection($id: Int!) {
 }
 
 mutation SaveSectionsRank($idList: [Int]!) {
-    saveSectionsRanks(sectionIds: $idList)
+    saveSectionsRanks(sectionIds: $idList) {
+        errors {
+            msg
+            loc
+        }
+    }
 }
 
 mutation SaveLinksRank($idList: [Int]!) {
-    saveLinksRanks(linkIds: $idList)
+    saveLinksRanks(linkIds: $idList) {
+        errors {
+            msg
+            loc
+        }
+    }
 }
 
 mutation SaveBoardSettings($settings: BoardSettingsInput!) {
-    saveBoardSettings(boardSettings: $settings)
+    saveBoardSettings(boardSettings: $settings) {
+        errors {
+            msg
+            loc
+        }
+    }
 }

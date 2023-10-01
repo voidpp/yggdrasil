@@ -61,14 +61,33 @@ type EarthPornImage {
 }
 
 type Mutation {
-  saveSection(section: SectionInput): Section
-  saveLink(link: LinkInput): Link
+  saveSection(section: SectionInput): SaveResult
+  saveLink(link: LinkInput): SaveResult
   deleteSection(id: Int!): Boolean
   deleteLink(id: Int!): Boolean
-  saveSectionsRanks(sectionIds: [Int]!): Boolean
-  saveLinksRanks(linkIds: [Int]!): Boolean
-  saveBoardSettings(boardSettings: BoardSettingsInput): Boolean
+  saveSectionsRanks(sectionIds: [Int]!): SaveResult
+  saveLinksRanks(linkIds: [Int]!): SaveResult
+  saveBoardSettings(boardSettings: BoardSettingsInput): SaveResult
 }
+
+type SaveResult {
+  errors: [Error]
+}
+
+type Error {
+  type: String!
+  loc: [String]!
+  msg: String!
+  ctx: JSONString!
+}
+
+"""
+Allows use of a JSON String for input / output from the GraphQL schema.
+
+Use of this type is *not recommended* as you lose the benefits of having a defined, static
+schema (one of the key benefits of GraphQL).
+"""
+scalar JSONString
 
 input SectionInput {
   id: Int
@@ -80,7 +99,7 @@ input LinkInput {
   id: Int
   title: String!
   url: String!
-  favicon: String!
+  favicon: String
   sectionId: Int!
   rank: Int!
 }

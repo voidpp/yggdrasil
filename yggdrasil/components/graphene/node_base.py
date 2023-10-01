@@ -22,9 +22,9 @@ class NoArgumentsDefinedError(Exception):
     pass
 
 
-class ValidationError(Exception):
+class NodeValidationError(Exception):
     def __init__(self, result):
-        super().__init__("ValidationError")
+        super().__init__("NodeValidationError")
         self.result = result
 
 
@@ -109,7 +109,7 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
 
         try:
             await obj.validate()
-        except ValidationError as e:
+        except NodeValidationError as e:
             return e.result
 
         result = await obj.resolve()
