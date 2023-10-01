@@ -1,12 +1,12 @@
 from typing import Annotated
 
 from pydantic import BaseModel, HttpUrl, StringConstraints, ValidationError
-from sqlalchemy import insert, update
+from sqlalchemy import insert, update, select, func
 
-from yggdrasil.api.types import SaveResult
+from yggdrasil.api.types import SaveResult, get_auth_error, Error
 from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig, NodeValidationError
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
-from yggdrasil.db_tables import link
+from yggdrasil.db_tables import link, section
 
 
 class Link(BaseModel):
@@ -29,12 +29,23 @@ class SaveLinkNode(NodeBase[SaveLinkValidator]):
     )
 
     async def validate(self):
+        if self.user_info is None:
+            raise NodeValidationError(SaveResult(errors=[get_auth_error()]))
+
         try:
             assert self.args
         except ValidationError as e:
             raise NodeValidationError(SaveResult(errors=e.errors()))
 
-        # TODO: check and test section_id is belongs to user
+        async with self.request_context.db.session() as session:
+            query = (
+                select(func.count())
+                .select_from(section)
+                .where(section.c.user_id == self.user_info.id, section.c.id == self.args.link.section_id)
+            )
+            count = (await session.execute(query)).scalar()
+            if count != 1:
+                raise NodeValidationError(SaveResult(errors=[Error(msg="Unknown section id")]))
 
     async def resolve(self):
         link_data = self.args.link.model_dump(exclude_unset=True, mode="json")

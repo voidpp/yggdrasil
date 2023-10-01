@@ -18,6 +18,15 @@ class AuthController:
     REDIRECT_ROUTE_NAME = "redirect"
     SESSION_USER_KEY = "user"
 
+    @classmethod
+    def update_session_dict(cls, session_dict: dict, user_info: UserInfo):
+        session_dict[cls.SESSION_USER_KEY] = user_info.model_dump()
+
+    @classmethod
+    def clear_session_dict(cls, session_dict: dict):
+        if cls.SESSION_USER_KEY in session_dict:
+            del session_dict[cls.SESSION_USER_KEY]
+
     def __init__(self, config: AppConfig):
         self._config = config
         self._oauth = OAuth()
@@ -54,12 +63,11 @@ class AuthController:
         user_info = UserInfo(**token["userinfo"])
         context: RequestContext = request.scope[RequestScopeKeys.CONTEXT]
         await user_info.store(context.db)
-        request.session[self.SESSION_USER_KEY] = user_info.model_dump()
+        self.update_session_dict(request.session, user_info)
         return RedirectResponse("/")
 
     async def logout(self, request: Request):
-        if self.SESSION_USER_KEY in request.session:
-            del request.session[self.SESSION_USER_KEY]
+        self.clear_session_dict(request.session)
         return RedirectResponse("/")
 
     def get_user(self, request: Request) -> UserInfo | None:

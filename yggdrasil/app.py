@@ -32,7 +32,7 @@ class LoggedGraphQLApp(GraphQLApp):
         return result
 
 
-def get_app(config: AppConfig = None):
+def get_app(config: AppConfig = None, session_middleware: type = SessionMiddleware):
     env = environment()
 
     if config is None:
@@ -57,7 +57,7 @@ def get_app(config: AppConfig = None):
         ],
         middleware=[
             Middleware(InjectionMiddleware, data={RequestScopeKeys.CONTEXT: request_context}),
-            Middleware(SessionMiddleware, secret_key=config.session_secret),
+            Middleware(session_middleware, secret_key=config.session_secret),
         ],
     )
 
