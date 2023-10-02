@@ -19,18 +19,17 @@ class SaveBoardSettingsNode(NodeBase[SaveBoardSettingsValidator]):
     )
 
     async def resolve(self):
-        async with self.request_context.db.session() as session:
-            query = (
-                update(user)
-                .values(
-                    {
-                        "board_background_type": self.args.board_settings.background.type,
-                        "board_background_value": self.args.board_settings.background.value,
-                    }
-                )
-                .where(user.c.id == self.user_info.id)
+        query = (
+            update(user)
+            .values(
+                {
+                    "board_background_type": self.args.board_settings.background.type,
+                    "board_background_value": self.args.board_settings.background.value,
+                }
             )
-            await session.execute(query)
-            await session.commit()
+            .where(user.c.id == self.user_info.id)
+        )
+        await self.db_session.execute(query)
+        await self.db_session.commit()
 
         return SaveResult()

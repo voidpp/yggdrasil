@@ -61,8 +61,8 @@ class AuthController:
         client = self._get_client(request)
         token = await client.authorize_access_token(request)
         user_info = UserInfo(**token["userinfo"])
-        context: RequestContext = request.scope[RequestScopeKeys.CONTEXT]
-        await user_info.store(context.db)
+        database_session = request.scope[RequestScopeKeys.DATABASE_SESSION]
+        await user_info.store(database_session)
         self.update_session_dict(request.session, user_info)
         return RedirectResponse("/")
 

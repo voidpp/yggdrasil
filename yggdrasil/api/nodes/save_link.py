@@ -4,7 +4,7 @@ from pydantic import BaseModel, HttpUrl, StringConstraints, ValidationError
 from sqlalchemy import insert, update, select, func
 
 from yggdrasil.api.types import SaveResult, get_auth_error, Error
-from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig, NodeValidationError
+from yggdrasil.components.graphene.node_base import NodeConfig, NodeValidationError, NodeBase
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import link, section
 
@@ -13,7 +13,7 @@ class Link(BaseModel):
     id: int = None
     title: Annotated[str, StringConstraints(min_length=2)]
     url: HttpUrl
-    favicon: HttpUrl = None
+    favicon: str = None
     section_id: int
     rank: int
 
@@ -37,15 +37,14 @@ class SaveLinkNode(NodeBase[SaveLinkValidator]):
         except ValidationError as e:
             raise NodeValidationError(SaveResult(errors=e.errors()))
 
-        async with self.request_context.db.session() as session:
-            query = (
-                select(func.count())
-                .select_from(section)
-                .where(section.c.user_id == self.user_info.id, section.c.id == self.args.link.section_id)
-            )
-            count = (await session.execute(query)).scalar()
-            if count != 1:
-                raise NodeValidationError(SaveResult(errors=[Error(msg="Unknown section id")]))
+        query = (
+            select(func.count())
+            .select_from(section)
+            .where(section.c.user_id == self.user_info.id, section.c.id == self.args.link.section_id)
+        )
+        count = (await self.db_session.execute(query)).scalar()
+        if count != 1:
+            raise NodeValidationError(SaveResult(errors=[Error(msg="Unknown section id")]))
 
     async def resolve(self):
         link_data = self.args.link.model_dump(exclude_unset=True, mode="json")
@@ -55,8 +54,7 @@ class SaveLinkNode(NodeBase[SaveLinkValidator]):
         else:
             query = update(link).where(link.c.id == self.args.link.id).values(link_data)
 
-        async with self.request_context.db.session() as session:
-            await session.execute(query)
-            await session.commit()
+        await self.db_session.execute(query)
+        await self.db_session.commit()
 
         return SaveResult()

@@ -1,14 +1,15 @@
 import os
-from contextlib import contextmanager, asynccontextmanager
+from contextlib import asynccontextmanager
 from typing import Callable, AsyncContextManager
 from uuid import uuid4
 
 import pytest
 import pytest_asyncio
+from sqlalchemy.ext.asyncio import AsyncSession
 from testing.postgresql import Postgresql
 
 from yggdrasil.app import get_app
-from yggdrasil.auth.controller import AuthController
+from yggdrasil.auth_controller import AuthController
 from yggdrasil.components.app_config import AppConfig
 from yggdrasil.components.database import Database
 from yggdrasil.components.user_info import UserInfo
@@ -31,6 +32,12 @@ async def database(database_url):
         await conn.run_sync(meta.drop_all)
 
     await db.engine.dispose()
+
+
+@pytest_asyncio.fixture()
+async def db_session(database) -> AsyncSession:
+    async with database.session() as session:
+        yield session
 
 
 @pytest.fixture(scope="session")
@@ -63,7 +70,7 @@ def test_client(app_config, fake_session_data):
 
 
 @pytest.fixture()
-def authenticate_user(fake_session_data, database) -> Callable[[], AsyncContextManager[UserInfo]]:
+def authenticate_user(fake_session_data, db_session) -> Callable[[], AsyncContextManager[UserInfo]]:
     @asynccontextmanager
     async def authenticate_user_wrapper(sub: str = None, email: str = "mulder@the-truth-is-out-there.com") -> UserInfo:
         user_info = UserInfo(
@@ -74,7 +81,7 @@ def authenticate_user(fake_session_data, database) -> Callable[[], AsyncContextM
             picture="picture",
             locale="en",
         )
-        await user_info.store(database)
+        await user_info.store(db_session)
         AuthController.update_session_dict(fake_session_data, user_info)
         yield user_info
         AuthController.clear_session_dict(fake_session_data)
@@ -83,5 +90,5 @@ def authenticate_user(fake_session_data, database) -> Callable[[], AsyncContextM
 
 
 @pytest.fixture()
-def populator(database):
-    return Populator(database)
+def populator(db_session):
+    return Populator(db_session)

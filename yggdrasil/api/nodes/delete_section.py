@@ -25,8 +25,7 @@ class DeleteSectionNode(NodeBase[DeleteSectionValidator]):
 
         query = delete(section).where(section.c.id == self.args.id)
 
-        async with self.request_context.db.session() as session:
-            await session.execute(query)
-            await session.commit()
+        await self.db_session.execute(query)
+        await self.db_session.commit()
 
         return True

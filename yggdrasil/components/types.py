@@ -1,2 +1,3 @@
 class RequestScopeKeys:
     CONTEXT = "CONTEXT"
+    DATABASE_SESSION = "DATABASE_SESSION"

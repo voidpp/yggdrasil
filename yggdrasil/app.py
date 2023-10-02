@@ -10,14 +10,13 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
 
 from yggdrasil.api.schema import create_api_schema
-from yggdrasil.auth.controller import AuthController
+from yggdrasil.auth_controller import AuthController
 from yggdrasil.components.app_config import load_app_config, AppConfig
 from yggdrasil.components.database import Database
 from yggdrasil.components.env import environment
-from yggdrasil.components.injection_middleware import InjectionMiddleware
+from yggdrasil.components.request_context_middleware import RequestContextMiddleware
 from yggdrasil.components.logger import init_logger
 from yggdrasil.components.request_context import RequestContext
-from yggdrasil.components.types import RequestScopeKeys
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +55,7 @@ def get_app(config: AppConfig = None, session_middleware: type = SessionMiddlewa
             Mount("/auth", routes=auth.get_routes()),
         ],
         middleware=[
-            Middleware(InjectionMiddleware, data={RequestScopeKeys.CONTEXT: request_context}),
+            Middleware(RequestContextMiddleware, context_data=request_context),
             Middleware(session_middleware, secret_key=config.session_secret),
         ],
     )

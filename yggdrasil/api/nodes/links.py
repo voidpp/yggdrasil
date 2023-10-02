@@ -29,7 +29,6 @@ class LinksNode(NodeBase[LinksValidator]):
 
         query = query.order_by(section.c.rank, link.c.rank)
 
-        async with self.request_context.db.session() as session:
-            result = await session.execute(query)
+        result = await self.db_session.execute(query)
 
-            return result.all()
+        return result.all()

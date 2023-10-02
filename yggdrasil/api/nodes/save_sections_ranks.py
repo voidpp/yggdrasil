@@ -20,9 +20,8 @@ class SaveSectionsRanksNode(NodeBase[SaveSectionsRanksValidator]):
     async def resolve(self):
         # TODO: auth, check section id ownership
 
-        async with self.request_context.db.session() as session:
-            for index, section_id in enumerate(self.args.section_ids):
-                await session.execute(update(section).where(section.c.id == section_id).values({"rank": index}))
-            await session.commit()
+        for index, section_id in enumerate(self.args.section_ids):
+            await self.db_session.execute(update(section).where(section.c.id == section_id).values({"rank": index}))
+        await self.db_session.commit()
 
         return SaveResult()

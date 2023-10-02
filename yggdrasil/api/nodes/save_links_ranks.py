@@ -20,9 +20,8 @@ class SaveLinksRanksNode(NodeBase[SaveLinksRanksValidator]):
     async def resolve(self):
         # TODO: auth, check link id ownership
 
-        async with self.request_context.db.session() as session:
-            for index, link_id in enumerate(self.args.link_ids):
-                await session.execute(update(link).where(link.c.id == link_id).values({"rank": index}))
-            await session.commit()
+        for index, link_id in enumerate(self.args.link_ids):
+            await self.db_session.execute(update(link).where(link.c.id == link_id).values({"rank": index}))
+        await self.db_session.commit()
 
         return SaveResult()

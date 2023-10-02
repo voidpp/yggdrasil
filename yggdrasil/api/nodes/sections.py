@@ -16,7 +16,6 @@ class SectionsNode(NodeBase):
     async def resolve(self):
         query = select(section).where(section.c.user_id == self.user_info.id).order_by(section.c.rank)
 
-        async with self.request_context.db.session() as session:
-            result = await session.execute(query)
+        result = await self.db_session.execute(query)
 
-            return result.all()
+        return result.all()

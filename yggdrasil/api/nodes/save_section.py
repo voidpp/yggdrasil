@@ -33,8 +33,7 @@ class SaveSectionNode(NodeBase[SaveSectionValidator]):
         else:
             query = update(section).where(section.c.id == self.args.section.id).values(section_data)
 
-        async with self.request_context.db.session() as session:
-            await session.execute(query)
-            await session.commit()
+        await self.db_session.execute(query)
+        await self.db_session.commit()
 
         return SaveResult()

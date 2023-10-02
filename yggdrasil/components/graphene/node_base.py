@@ -14,6 +14,7 @@ from starlette.requests import Request
 from .pydantic import create_class_property_dict
 from .tools import get_field_name_list, get_request_context
 from ..request_context import RequestContext
+from ..types import RequestScopeKeys
 
 InputType = TypeVar("InputType")
 
@@ -78,6 +79,10 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
             if node_name in node_name_list:
                 return True
         return False
+
+    @property
+    def db_session(self):
+        return self._info.context["request"].scope[RequestScopeKeys.DATABASE_SESSION]
 
     @property
     def request_context(self) -> RequestContext:

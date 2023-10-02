@@ -12,11 +12,10 @@ class BoardSettingsNode(NodeBase):
     )
 
     async def resolve(self):
-        async with self.request_context.db.session() as session:
-            query = select(user).where(user.c.id == self.user_info.id)
-            query_result = await session.execute(query)
-            user_data = query_result.first()
+        query = select(user).where(user.c.id == self.user_info.id)
+        query_result = await self.db_session.execute(query)
+        user_data = query_result.first()
 
-            bg_data = BoardBackground(type=user_data.board_background_type, value=user_data.board_background_value)
+        bg_data = BoardBackground(type=user_data.board_background_type, value=user_data.board_background_value)
 
-            return BoardSettings(background=bg_data)
+        return BoardSettings(background=bg_data)

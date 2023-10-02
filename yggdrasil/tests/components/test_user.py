@@ -6,7 +6,7 @@ from yggdrasil.db_tables import user
 
 
 @pytest.mark.asyncio
-async def test_store_new_user(database):
+async def test_store_new_user(db_session):
     user_info = UserInfo(
         sub="sub",
         email="email",
@@ -16,13 +16,13 @@ async def test_store_new_user(database):
         locale="locale",
     )
 
-    await user_info.store(database)
+    await user_info.store(db_session)
 
     assert user_info.id
 
 
 @pytest.mark.asyncio
-async def test_update_user(database):
+async def test_update_user(db_session):
     user_info = UserInfo(
         sub="sub",
         email="email",
@@ -32,14 +32,13 @@ async def test_update_user(database):
         locale="locale",
     )
 
-    await user_info.store(database)
+    await user_info.store(db_session)
 
     user_info.email = "email2"
 
-    await user_info.store(database)
+    await user_info.store(db_session)
 
-    async with database.session() as session:
-        users = (await session.execute(select(user))).all()
+    users = (await db_session.execute(select(user))).all()
 
-        assert len(users) == 1
-        assert users[0].email == "email2"
+    assert len(users) == 1
+    assert users[0].email == "email2"
