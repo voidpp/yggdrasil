@@ -12,6 +12,9 @@ class BoardSettingsNode(NodeBase):
     )
 
     async def resolve(self):
+        if self.user_info is None:
+            return None
+
         query = select(user).where(user.c.id == self.user_info.id)
         query_result = await self.db_session.execute(query)
         user_data = query_result.first()

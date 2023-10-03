@@ -13,7 +13,7 @@ class Link(BaseModel):
     id: int
     title: str
     url: str
-    favicon: str
+    favicon: str = None
     section_id: int
     rank: int
 

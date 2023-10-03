@@ -51,7 +51,7 @@ def database_url():
         yield postgresql.url().replace("postgresql://", "postgresql+asyncpg://")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def fake_session_data():
     return {}
 
@@ -61,32 +61,18 @@ def app_config(database_url):
     return AppConfig(database_url=database_url, session_secret="test", auth_clients={})
 
 
-@pytest.fixture(scope="session")
-def test_client(app_config, fake_session_data):
+@pytest.fixture()
+def test_client(app_config, fake_session_data, db_session):
     session_middleware = get_fake_session_middleware(fake_session_data)
     app = get_app(config=app_config, session_middleware=session_middleware)
-    client = YggdarsilTestClient(app)
+    client = YggdarsilTestClient(app, db_session, fake_session_data)
     return client
 
 
-@pytest.fixture()
-def authenticate_user(fake_session_data, db_session) -> Callable[[], AsyncContextManager[UserInfo]]:
-    @asynccontextmanager
-    async def authenticate_user_wrapper(sub: str = None, email: str = "mulder@the-truth-is-out-there.com") -> UserInfo:
-        user_info = UserInfo(
-            sub=sub or uuid4().hex,
-            email=email,
-            given_name="given_name",
-            family_name="family_name",
-            picture="picture",
-            locale="en",
-        )
-        await user_info.store(db_session)
-        AuthController.update_session_dict(fake_session_data, user_info)
-        yield user_info
-        AuthController.clear_session_dict(fake_session_data)
-
-    return authenticate_user_wrapper
+@pytest_asyncio.fixture()
+async def authenticated_user(test_client) -> UserInfo:
+    async with test_client.authenticate_user() as user:
+        yield user
 
 
 @pytest.fixture()

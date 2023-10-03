@@ -35,8 +35,60 @@ async def test_no_auth(test_client):
 
 
 @pytest.mark.asyncio
-async def test_save_a_link(test_client, authenticate_user, populator):
-    async with authenticate_user() as user:
-        section_id = await populator.add_section(user.id)
-        result = test_client.query(query, generate_link_vars({"sectionId": section_id}))
-        assert result["data"]["saveLink"]["errors"] == []
+async def test_create_link(test_client, populator, authenticated_user):
+    section_id = await populator.add_section(authenticated_user.id)
+    result = test_client.query(query, generate_link_vars({"sectionId": section_id, "title": "yey"}))
+    assert result["data"]["saveLink"]["errors"] == []
+    links = await populator.list_links(section_ids={section_id})
+    assert len(links) == 1
+    assert links[0].title == "yey"
+
+
+@pytest.mark.asyncio
+async def test_create_link_other_section(test_client, populator):
+    async with test_client.authenticate_user() as mulder:
+        section_id = await populator.add_section(mulder.id)
+
+    async with test_client.authenticate_user():
+        result = test_client.query(query, generate_link_vars({"sectionId": section_id, "title": "yey"}))
+        assert result["data"]["saveLink"]["errors"][0]["msg"] == "Unknown section id"
+
+
+@pytest.mark.asyncio
+async def test_update_own_link(test_client, populator, authenticated_user):
+    section_id = await populator.add_section(authenticated_user.id)
+    link_id = await populator.add_link(section_id)
+    result = test_client.query(
+        query, generate_link_vars({"sectionId": section_id, "id": link_id, "title": "not_google"})
+    )
+    assert result["data"]["saveLink"]["errors"] == []
+    links = await populator.list_links(link_ids={link_id})
+    assert len(links)
+    assert links[0].title == "not_google"
+
+
+@pytest.mark.asyncio
+async def test_update_not_own_section(test_client, populator):
+    async with test_client.authenticate_user() as mulder:
+        section_id = await populator.add_section(mulder.id)
+        link_id = await populator.add_link(section_id)
+
+    async with test_client.authenticate_user():
+        result = test_client.query(
+            query, generate_link_vars({"sectionId": section_id, "id": link_id, "title": "not_google"})
+        )
+        assert result["data"]["saveLink"]["errors"][0]["msg"] == "Unknown link/section"
+
+
+@pytest.mark.asyncio
+async def test_update_not_own_link(test_client, populator):
+    async with test_client.authenticate_user() as mulder:
+        section_id = await populator.add_section(mulder.id)
+        link_id = await populator.add_link(section_id)
+
+    async with test_client.authenticate_user() as scully:
+        section_id = await populator.add_section(scully.id)
+        result = test_client.query(
+            query, generate_link_vars({"sectionId": section_id, "id": link_id, "title": "not_google"})
+        )
+        assert result["data"]["saveLink"]["errors"][0]["msg"] == "Unknown link/section"

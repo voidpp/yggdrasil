@@ -9,6 +9,7 @@ import orjson
 from graphene import Field, InputObjectType, ResolveInfo
 from graphene.utils.orderedtype import OrderedType
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
 from .pydantic import create_class_property_dict
@@ -81,7 +82,7 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
         return False
 
     @property
-    def db_session(self):
+    def db_session(self) -> AsyncSession:
         return self._info.context["request"].scope[RequestScopeKeys.DATABASE_SESSION]
 
     @property

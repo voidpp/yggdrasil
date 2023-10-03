@@ -12,5 +12,5 @@ def get_auth_error():
     return Error(msg="Authentication needed")
 
 
-class SaveResult(BaseModel):
+class CommonMutationResult(BaseModel):
     errors: list[Error] = Field(default_factory=list)
