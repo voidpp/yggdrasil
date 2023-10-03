@@ -19,6 +19,7 @@ from graphene import (
     List,
     ObjectType,
     String,
+    NonNull,
 )
 from graphene.types.base import BaseType
 from pydantic import BaseModel
@@ -96,7 +97,7 @@ def create_class_property_dict(
 
         if get_origin(type_) == list:
             list_item_class = _create_list_item_class(type_, sub_type)
-            properties[property_name] = List(list_item_class, required=required, description=description)
+            properties[property_name] = List(NonNull(list_item_class), required=required, description=description)
             continue
 
         if get_origin(type_) == Annotated:

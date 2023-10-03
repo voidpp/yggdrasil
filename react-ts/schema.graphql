@@ -34,7 +34,7 @@ type Link {
   id: Int!
   title: String!
   url: String!
-  favicon: String!
+  favicon: String
   sectionId: Int!
   rank: Int!
 }
@@ -61,24 +61,24 @@ type EarthPornImage {
 }
 
 type Mutation {
-  saveSection(section: SectionInput): SaveResult
-  saveLink(link: LinkInput): SaveResult
-  deleteSection(id: Int!): Boolean
-  deleteLink(id: Int!): Boolean
-  saveSectionsRanks(sectionIds: [Int]!): SaveResult
-  saveLinksRanks(linkIds: [Int]!): SaveResult
-  saveBoardSettings(boardSettings: BoardSettingsInput): SaveResult
+  saveSection(section: SectionInput): CommonMutationResult
+  saveLink(link: LinkInput): CommonMutationResult
+  deleteSection(id: Int!): CommonMutationResult
+  deleteLink(id: Int!): CommonMutationResult
+  saveSectionsRanks(sectionIds: [Int!]!): CommonMutationResult
+  saveLinksRanks(linkIds: [Int!]!): CommonMutationResult
+  saveBoardSettings(boardSettings: BoardSettingsInput): CommonMutationResult
 }
 
-type SaveResult {
-  errors: [Error]
+type CommonMutationResult {
+  errors: [Error!]
 }
 
 type Error {
-  type: String!
-  loc: [String]!
   msg: String!
-  ctx: JSONString!
+  type: String
+  loc: [String!]
+  ctx: JSONString
 }
 
 """

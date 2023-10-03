@@ -71,11 +71,19 @@ mutation SaveSection($section: SectionInput!) {
 }
 
 mutation DeleteLink($id: Int!) {
-    deleteLink(id: $id)
+    deleteLink(id: $id) {
+        errors {
+            msg
+        }
+    }
 }
 
 mutation DeleteSection($id: Int!) {
-    deleteSection(id: $id)
+    deleteSection(id: $id) {
+        errors {
+            msg
+        }
+    }
 }
 
 mutation SaveSectionsRank($idList: [Int]!) {

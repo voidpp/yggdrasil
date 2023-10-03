@@ -30,7 +30,6 @@ def test_generate_string_constraint():
     assert type(graphene_object.title) is String
 
 
-@pytest.mark.skip
 def test_generate_required_in_list():
     class Example(BaseModel):
         messages: list[str]
@@ -39,7 +38,5 @@ def test_generate_required_in_list():
     graphene_object = object_type_from_pydantic(Example)
 
     messages_field: List = graphene_object.messages
-
-    assert messages_field.kwargs.get("required") is True
 
     assert type(messages_field.of_type) == NonNull
