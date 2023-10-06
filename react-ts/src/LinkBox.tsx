@@ -27,14 +27,14 @@ import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useEditMode } from "./editMode.tsx";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { sortDropItems } from "./tools.ts";
+import { removeTypename, sortDropItems } from "./tools.ts";
 import { useApolloClient } from "@apollo/client";
 
 type LinkFormData = {
   id?: number;
   title: string;
   url: string;
-  favicon: string;
+  favicon?: string | null;
   sectionId: number;
   rank: number;
 };
@@ -57,7 +57,7 @@ const SaveLinkFormDialog = ({
     const result = await saveLink({ variables: { link: data } });
     if (result.data?.saveLink?.errors?.length) {
       for (const error of result.data.saveLink.errors) {
-        if (error) setError(error.loc[1] as keyof LinkFormData, { message: error.msg });
+        if (error && error.loc) setError(error.loc[1] as keyof LinkFormData, { message: error.msg });
       }
     } else {
       if (!linkData.id) reset();
@@ -161,7 +161,6 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    px: 4,
     py: 2,
     pb: 1.5,
     borderRadius: 1,
@@ -170,7 +169,7 @@ const styles = {
     textDecoration: "none",
     userSelect: "none",
     "&:hover": {
-      backgroundColor: "rgba(0,0,0,0.3)",
+      backgroundColor: "rgba(255,255,255,0.1)",
     },
   },
   menuIconContainer: {
@@ -181,8 +180,18 @@ const styles = {
   linkTitle: {
     textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
     color: "white",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    maxWidth: 120,
+    px: 1,
+    whiteSpace: "nowrap",
+  },
+  linkList: {
+    display: "flex",
+    alignItems: "center",
   },
   faviconContainer: {
+    mx: 4,
     backgroundColor: "rgba(0,0,0,0.5)",
     width: 58,
     height: 58,
@@ -191,6 +200,10 @@ const styles = {
     justifyContent: "center",
     borderRadius: "100%",
     mb: 1,
+    "& > img": {
+      width: 32,
+      height: 32,
+    },
   },
 } satisfies Record<string, SxProps>;
 
@@ -202,9 +215,6 @@ const LinkMenu = ({ link, refetchLinks }: { link: Link; refetchLinks: () => void
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const formLink = { ...link };
-  delete formLink.__typename;
 
   return (
     <>
@@ -239,7 +249,7 @@ const LinkMenu = ({ link, refetchLinks }: { link: Link; refetchLinks: () => void
       <SaveLinkFormDialog
         open={openLinkDialog}
         close={() => setOpenLinkDialog(false)}
-        linkData={formLink}
+        linkData={removeTypename(link)}
         onSave={refetchLinks}
       />
     </>
@@ -294,7 +304,7 @@ export const LinkBoxList = ({
     >
       <Droppable droppableId="droppable-link-list" direction="horizontal" isDropDisabled={!editMode}>
         {(provided) => (
-          <Box {...provided.droppableProps} ref={provided.innerRef} sx={{ display: "flex", alignItems: "center" }}>
+          <Box {...provided.droppableProps} ref={provided.innerRef} sx={styles.linkList}>
             {links.map((link, index) => (
               <Draggable key={link.id} draggableId={`link-item-${link.id}`} index={index} isDragDisabled={!editMode}>
                 {(provided) => (

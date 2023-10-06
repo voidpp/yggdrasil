@@ -1,10 +1,8 @@
-import json
 import re
 from dataclasses import dataclass
 
 from pydantic import BaseModel
 
-from yggdrasil.components.folders import Folders
 from async_lru import alru_cache
 from httpx import AsyncClient
 
@@ -16,14 +14,9 @@ class EarthPornImage(BaseModel):
 
 @alru_cache
 async def get_earth_porn_json():
-    print("fetch from reddit")
-    file = Folders.project_root / "_tmp_earth_porn.json"
-
-    return json.loads(file.read_text())
-
-    # async with AsyncClient() as client:
-    #     response = await client.get("https://www.reddit.com/r/EarthPorn.json")
-    #     return response.json()
+    async with AsyncClient() as client:
+        response = await client.get("https://www.reddit.com/r/EarthPorn.json")
+        return response.json()
 
 
 @dataclass

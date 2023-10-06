@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from yggdrasil.components.database import Database
 from yggdrasil.db_tables import user
-from yggdrasil.types import BoardBackgroundType
+from yggdrasil.schema import BoardBackgroundType
 
 
 class UserInfo(BaseModel):

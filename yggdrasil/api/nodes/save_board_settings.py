@@ -5,7 +5,7 @@ from yggdrasil.api.types import CommonMutationResult, get_auth_error
 from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig, NodeValidationError
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import user
-from yggdrasil.types import BoardSettings
+from yggdrasil.schema import BoardSettings
 
 
 class SaveBoardSettingsValidator(BaseModel):

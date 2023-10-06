@@ -3,7 +3,7 @@ from sqlalchemy import select
 from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import user
-from yggdrasil.types import BoardSettings, BoardBackground
+from yggdrasil.schema import BoardSettings, BoardBackground
 
 
 class BoardSettingsNode(NodeBase):

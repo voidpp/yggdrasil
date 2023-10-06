@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from yggdrasil.components.user_info import UserInfo
 from yggdrasil.db_tables import section, link
-from yggdrasil.types import Link, Section
+from yggdrasil.schema import Link, Section
 
 
 class Populator:

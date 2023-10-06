@@ -86,7 +86,7 @@ mutation DeleteSection($id: Int!) {
     }
 }
 
-mutation SaveSectionsRank($idList: [Int]!) {
+mutation SaveSectionsRank($idList: [Int!]!) {
     saveSectionsRanks(sectionIds: $idList) {
         errors {
             msg
@@ -95,7 +95,7 @@ mutation SaveSectionsRank($idList: [Int]!) {
     }
 }
 
-mutation SaveLinksRank($idList: [Int]!) {
+mutation SaveLinksRank($idList: [Int!]!) {
     saveLinksRanks(linkIds: $idList) {
         errors {
             msg

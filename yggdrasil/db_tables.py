@@ -1,6 +1,6 @@
 from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, Enum
 
-from yggdrasil.types import BoardBackgroundType
+from yggdrasil.schema import BoardBackgroundType
 
 meta = MetaData()
 

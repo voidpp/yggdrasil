@@ -4,7 +4,7 @@ from sqlalchemy import select
 from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import section
-from yggdrasil.types import Section
+from yggdrasil.schema import Section
 
 
 class SectionsNode(NodeBase):

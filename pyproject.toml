@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "yggdrasil"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "Yggdrasil"
+authors = ["Lajos Santa <santa.lajos@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+include = ["yggdrasil/ui-dist/**/*.*"]
 
 [tool.poetry.dependencies]
 python = "^3.11"

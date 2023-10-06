@@ -25,7 +25,7 @@ import { useEditMode } from "./editMode.tsx";
 import { DragDropContext, Droppable, Draggable, DraggableProvided } from "react-beautiful-dnd";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { useApolloClient } from "@apollo/client";
-import { sortDropItems } from "./tools.ts";
+import { removeTypename, sortDropItems } from "./tools.ts";
 
 const styles = {
   sectionContainer: {
@@ -113,12 +113,6 @@ export const AddSectionFormButton = ({ onSave, nextRank }: { onSave: () => void;
       />
     </>
   );
-};
-
-const removeTypename = <T extends { __typename?: string }>(object: T): Omit<T, "__typename"> => {
-  const cloned = { ...object };
-  if (cloned.__typename) delete cloned.__typename;
-  return cloned;
 };
 
 const SectionHeader = ({

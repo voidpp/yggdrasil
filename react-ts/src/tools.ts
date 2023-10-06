@@ -10,3 +10,9 @@ export const sortDropItems = <T>(items: T[], dropResult: DropResult): T[] => {
 
   return itemsCopy;
 };
+
+export const removeTypename = <T extends { __typename?: string }>(object: T): Omit<T, "__typename"> => {
+  const cloned = { ...object };
+  if (cloned.__typename) delete cloned.__typename;
+  return cloned;
+};

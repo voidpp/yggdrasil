@@ -5,7 +5,7 @@ from sqlalchemy import select
 from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import link, section
-from yggdrasil.types import Link
+from yggdrasil.schema import Link
 
 
 class LinksValidator(BaseModel):
