@@ -1,3 +1,4 @@
+import logging
 import re
 from dataclasses import dataclass
 
@@ -5,6 +6,9 @@ from pydantic import BaseModel
 
 from async_lru import alru_cache
 from httpx import AsyncClient
+
+
+logger = logging.getLogger(__name__)
 
 
 class EarthPornImage(BaseModel):
@@ -15,6 +19,7 @@ class EarthPornImage(BaseModel):
 @alru_cache
 async def get_earth_porn_json():
     async with AsyncClient() as client:
+        logger.info("Fetching EarthPorn.json from reddit.com")
         response = await client.get("https://www.reddit.com/r/EarthPorn.json")
         return response.json()
 

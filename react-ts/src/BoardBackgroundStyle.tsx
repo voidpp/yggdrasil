@@ -1,5 +1,4 @@
 import { BoardBackground, BoardBackgroundType, useEarthPornImagesQuery } from "./graphql-types-and-hooks.tsx";
-import { useMemo } from "react";
 import { Box, Link, SxProps, Theme } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { Helmet } from "react-helmet";
@@ -7,13 +6,13 @@ import { Helmet } from "react-helmet";
 const styles = {
   backgroundTitle: {
     position: "fixed",
-    left: 0,
+    right: 0,
     bottom: 0,
     px: 1,
     py: 0.5,
     backdropFilter: "blur(4px)",
     textShadow: "1px 1px 2px black",
-    borderTopRightRadius: 4,
+    borderTopLeftRadius: 4,
     backgroundColor: "rgba(0,0,0,0.4)",
     display: "flex",
     alignItems: "center",
@@ -30,13 +29,7 @@ const styles = {
 export const BoardBackgroundEarthPornImage = () => {
   const { data: earthPornImagesData } = useEarthPornImagesQuery();
 
-  const image = useMemo(() => {
-    if (!earthPornImagesData?.earthPornImages) return null;
-
-    const images = earthPornImagesData?.earthPornImages;
-    const randomImageIndex = Math.floor(Math.random() * images.length);
-    return images[randomImageIndex];
-  }, [earthPornImagesData?.earthPornImages]);
+  const image = earthPornImagesData?.earthPornImages?.[0] ?? null;
 
   if (image === null) return null;
 

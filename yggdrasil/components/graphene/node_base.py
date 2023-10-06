@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
 from .pydantic import create_class_property_dict
-from .tools import get_field_name_list, get_request_context
+from .tools import get_field_name_list, get_request_context, create_json_serializable_data
 from ..request_context import RequestContext
 from ..types import RequestScopeKeys
 
@@ -113,12 +113,17 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
     async def _resolve(cls, root, info, **kwargs):
         obj = cls(root, info, **kwargs)
 
+        if data := await obj.get_data_from_cache():
+            return data
+
         try:
             await obj.validate()
         except NodeValidationError as e:
             return e.result
 
         result = await obj.resolve()
+
+        await obj.set_data_to_cache(result)
 
         return result
 
@@ -129,6 +134,21 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
             sorted_args = dict(sorted(self._kwargs.items()))
             key += "_" + base64.encodebytes(orjson.dumps(sorted_args)).decode()
         return key
+
+    async def set_data_to_cache(self, data):
+        if not self.config.cache_expiry_time:
+            return
+
+        await self.request_context.redis.set(
+            self.cache_key, orjson.dumps(create_json_serializable_data(data)), self.config.cache_expiry_time
+        )
+
+    async def get_data_from_cache(self):
+        if not self.config.cache_expiry_time:
+            return
+
+        if data := await self.request_context.redis.get(self.cache_key):
+            return orjson.loads(data)
 
     @classmethod
     def field(cls) -> Field:

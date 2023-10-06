@@ -1,6 +1,7 @@
 import logging
 from time import time
 
+from redis import asyncio as aioredis
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.requests import Request
@@ -45,8 +46,9 @@ def get_app(config: AppConfig = None, session_middleware: type = SessionMiddlewa
 
     auth = AuthController(config)
     auth.register_oauth_clients()
+    redis = aioredis.from_url(config.redis_url)
 
-    request_context = RequestContext(Database(config.database_url), auth, config)
+    request_context = RequestContext(Database(config.database_url), auth, config, redis)
 
     app = Starlette(
         debug,

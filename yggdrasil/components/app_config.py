@@ -13,6 +13,7 @@ class OAuthClient(BaseModel):
 
 class AppConfig(BaseModel):
     database_url: str
+    redis_url: str
     auth_clients: dict[str, OAuthClient]
     session_secret: str
 

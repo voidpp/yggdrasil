@@ -1,6 +1,7 @@
 from graphene import Field, ObjectType, ResolveInfo
 from graphql import FieldNode
 from graphql.pyutils.convert_case import camel_to_snake
+from pydantic import BaseModel
 
 from yggdrasil.components.request_context import RequestContext
 from yggdrasil.components.types import RequestScopeKeys
@@ -28,3 +29,16 @@ def get_field_name_list(node: FieldNode) -> list[str]:
 
 def get_request_context(info: ResolveInfo) -> RequestContext:
     return info.context["request"].scope[RequestScopeKeys.CONTEXT]
+
+
+def create_json_serializable_data(data):
+    if isinstance(data, list):
+        return [create_json_serializable_data(val) for val in data]
+    elif isinstance(data, dict):
+        return {key: create_json_serializable_data(val) for key, val in data.items()}
+    elif isinstance(data, BaseModel):
+        return data.dict()
+    elif isinstance(data, ObjectType):
+        return data.__dict__
+    else:
+        return data

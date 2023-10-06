@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "yggdrasil"
-version = "0.1.0"
+version = "1.0.0"
 description = "Yggdrasil"
 authors = ["Lajos Santa <santa.lajos@gmail.com>"]
 license = "MIT"
@@ -23,6 +23,7 @@ itsdangerous = "^2.1.2"
 httpx = "^0.25.0"
 pyyaml = "^6.0.1"
 async-lru = "^2.0.4"
+redis = "^5.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
