@@ -64,7 +64,8 @@ const styles = {
     pl: 1,
     display: "flex",
     alignItems: "center",
-    borderRadius: 1,
+    borderRadius: 2,
+    cursor: "pointer",
   },
 } satisfies Record<string, SxProps<Theme>>;
 
@@ -72,8 +73,8 @@ const EditModeControl = () => {
   const { editMode, setEditMode } = useEditMode();
 
   return (
-    <Box sx={styles.editModeControl}>
-      Edit: <Switch checked={editMode} onChange={(_ev, checked) => setEditMode(checked)} />
+    <Box sx={styles.editModeControl} onClick={() => setEditMode(!editMode)}>
+      Edit: <Switch checked={editMode} size="small" sx={{ m: 0.5 }} />
     </Box>
   );
 };
@@ -187,9 +188,9 @@ export const Board = () => {
         <UserMenu />
       </Box>
       <Box sx={styles.board}>
-        <Box sx={styles.boardTitle}>
-          <Typography variant="h5">Yggdrasil</Typography>
-          {editMode && (
+        {editMode && (
+          <Box sx={styles.boardTitle}>
+            <Typography variant="h5">Yggdrasil</Typography>
             <Box>
               {boardSettingsData?.boardSettings && (
                 <BoardSettingsDialogButton settings={boardSettingsData?.boardSettings} onSave={refetchBoardSettings} />
@@ -199,8 +200,8 @@ export const Board = () => {
                 nextRank={Math.max(...sections.map((section) => section.rank), 0) + 1}
               />
             </Box>
-          )}
-        </Box>
+          </Box>
+        )}
         <SectionList sections={sections} refetchSections={refetchSections} />
       </Box>
     </Box>

@@ -178,7 +178,7 @@ const styles = {
     right: 0,
   },
   linkTitle: {
-    textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
+    textShadow: "2px 2px 2px black",
     color: "white",
     overflow: "hidden",
     textOverflow: "ellipsis",
