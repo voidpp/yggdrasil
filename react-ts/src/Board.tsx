@@ -28,6 +28,7 @@ import { UserMenu } from "./UserMenu.tsx";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { BoardBackgroundStyle } from "./BoardBackgroundStyle.tsx";
+import { commonStyles } from "./styles.ts";
 
 const styles = {
   boardContainer: {
@@ -46,26 +47,26 @@ const styles = {
     gap: 1,
   },
   boardTitle: {
-    backgroundColor: "rgba(0,0,0,0.5)",
     px: 2,
     py: 1,
     borderRadius: 2,
-    backdropFilter: "blur(5px)",
     display: "flex",
     alignItems: "center",
     gap: 3,
     width: "100%",
     justifyContent: "space-between",
+    textShadow: "1px 1px 2px black",
+    ...commonStyles.glass,
   },
   editModeControl: {
     m: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    backdropFilter: "blur(4px)",
     pl: 1,
     display: "flex",
     alignItems: "center",
     borderRadius: 2,
     cursor: "pointer",
+    textShadow: "1px 1px 2px black",
+    ...commonStyles.glass,
   },
 } satisfies Record<string, SxProps<Theme>>;
 
@@ -119,7 +120,9 @@ const BoardSettingsDialogButton = ({ settings, onSave }: { settings: BoardSettin
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>settings</Button>
+      <Button onClick={() => setOpen(true)} sx={commonStyles.buttonOnGlass}>
+        settings
+      </Button>
       <Dialog open={open} onClose={close} TransitionProps={{ onExited: () => reset() }}>
         <DialogTitle sx={{ pb: 0 }}>Board settings</DialogTitle>
         <DialogContent sx={{ pb: 0 }}>

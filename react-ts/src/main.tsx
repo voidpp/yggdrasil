@@ -15,6 +15,14 @@ const darkTheme = createTheme({
   palette: {
     mode: "dark",
   },
+  components: {
+    MuiTooltip: {
+      defaultProps: {
+        arrow: true,
+        placement: "top",
+      },
+    },
+  },
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

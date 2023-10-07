@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Link,
-  LinksBySectionDocument,
-  LinksBySectionQuery,
-  LinksBySectionQueryVariables,
-  useDeleteLinkMutation,
-  useSaveLinkMutation,
-  useSaveLinksRankMutation,
-} from "./graphql-types-and-hooks.tsx";
+import { Link, useDeleteLinkMutation, useSaveLinkMutation } from "./graphql-types-and-hooks.tsx";
 import {
   Box,
   Button,
@@ -26,9 +18,8 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useEditMode } from "./editMode.tsx";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { removeTypename, sortDropItems } from "./tools.ts";
-import { useApolloClient } from "@apollo/client";
+import { Draggable, Droppable } from "react-beautiful-dnd";
+import { DropTargetType, removeTypename } from "./tools.ts";
 
 type LinkFormData = {
   id?: number;
@@ -141,7 +132,7 @@ export const AddLinkFormButton = ({
 
   return (
     <Box sx={sx}>
-      <Tooltip title="Add link" placement="top" arrow>
+      <Tooltip title="Add link">
         <IconButton onClick={() => setOpen(true)}>
           <AddIcon fontSize="large" />
         </IconButton>
@@ -264,13 +255,15 @@ export const LinkBox = ({ link, refetchLinks }: { link: Link; refetchLinks: () =
     : `https://www.google.com/s2/favicons?domain=${encodeURIComponent(link.url)}&sz=32`;
 
   return (
-    <Box sx={styles.linkBox} component={editMode ? "div" : "a"} href={link.url}>
-      {editMode && <LinkMenu link={link} refetchLinks={refetchLinks} />}
-      <Box sx={styles.faviconContainer}>
-        <img src={faviconImage} alt={link.title} />
+    <Tooltip title="Drag to change order or section" disableHoverListener={!editMode}>
+      <Box sx={styles.linkBox} component={editMode ? "div" : "a"} href={link.url}>
+        {editMode && <LinkMenu link={link} refetchLinks={refetchLinks} />}
+        <Box sx={styles.faviconContainer}>
+          <img src={faviconImage} alt={link.title} />
+        </Box>
+        <Box sx={styles.linkTitle}>{link.title}</Box>
       </Box>
-      <Box sx={styles.linkTitle}>{link.title}</Box>
-    </Box>
+    </Tooltip>
   );
 };
 
@@ -284,45 +277,33 @@ export const LinkBoxList = ({
   sectionId: number;
 }) => {
   const { editMode } = useEditMode();
-  const client = useApolloClient();
-  const [saveLinksRank] = useSaveLinksRankMutation();
 
   return (
-    <DragDropContext
-      onDragEnd={async (result) => {
-        if (!result.destination) return;
-        const linksCopy = sortDropItems(links, result);
-
-        client.writeQuery<LinksBySectionQuery, LinksBySectionQueryVariables>({
-          query: LinksBySectionDocument,
-          data: { links: linksCopy },
-          variables: { sectionId },
-        });
-        await saveLinksRank({ variables: { idList: linksCopy.map((link) => link.id) } });
-        await refetchLinks();
-      }}
+    <Droppable
+      droppableId={`link_list-${sectionId}`}
+      direction="horizontal"
+      isDropDisabled={!editMode}
+      type={DropTargetType.LINK}
     >
-      <Droppable droppableId="droppable-link-list" direction="horizontal" isDropDisabled={!editMode}>
-        {(provided) => (
-          <Box {...provided.droppableProps} ref={provided.innerRef} sx={styles.linkList}>
-            {links.map((link, index) => (
-              <Draggable key={link.id} draggableId={`link-item-${link.id}`} index={index} isDragDisabled={!editMode}>
-                {(provided) => (
-                  <Box
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={provided.draggableProps.style}
-                  >
-                    <LinkBox link={link} key={link.id} refetchLinks={refetchLinks} />
-                  </Box>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </Box>
-        )}
-      </Droppable>
-    </DragDropContext>
+      {(provided) => (
+        <Box {...provided.droppableProps} ref={provided.innerRef} sx={styles.linkList}>
+          {links.map((link, index) => (
+            <Draggable key={link.id} draggableId={`link_item-${link.id}`} index={index} isDragDisabled={!editMode}>
+              {(provided) => (
+                <Box
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  style={provided.draggableProps.style}
+                >
+                  <LinkBox link={link} key={link.id} refetchLinks={refetchLinks} />
+                </Box>
+              )}
+            </Draggable>
+          ))}
+          {provided.placeholder}
+        </Box>
+      )}
+    </Droppable>
   );
 };

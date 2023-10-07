@@ -1,12 +1,9 @@
 import { useState } from "react";
 import {
   Section,
-  SectionsDocument,
-  SectionsQuery,
   useDeleteSectionMutation,
   useLinksBySectionQuery,
   useSaveSectionMutation,
-  useSaveSectionsRankMutation,
 } from "./graphql-types-and-hooks.tsx";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -18,21 +15,22 @@ import {
   DialogTitle,
   SxProps,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { AddLinkFormButton, LinkBoxList } from "./LinkBox.tsx";
 import { useEditMode } from "./editMode.tsx";
-import { DragDropContext, Droppable, Draggable, DraggableProvided } from "react-beautiful-dnd";
+import { DragDropContext, Draggable, DraggableProvided, Droppable } from "react-beautiful-dnd";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { useApolloClient } from "@apollo/client";
-import { removeTypename, sortDropItems } from "./tools.ts";
+import { DropTargetType, removeTypename } from "./tools.ts";
+import { useDragEndHandler } from "./sortableHandlers.ts";
+import { commonStyles } from "./styles.ts";
 
 const styles = {
   sectionContainer: {
     borderRadius: 4,
   },
   panel: {
-    backgroundColor: "rgba(0,0,0,0.5)",
     p: 2,
     borderRadius: 2,
     width: "100%",
@@ -44,11 +42,11 @@ const styles = {
       top: 0,
       left: 0,
       content: '""',
-      backdropFilter: "blur(5px)",
       position: "absolute",
       width: "100%",
       height: "100%",
       zIndex: -1,
+      ...commonStyles.glass,
     },
   },
 } satisfies Record<string, SxProps>;
@@ -88,7 +86,15 @@ const SectionFormDialog = ({
           <Controller
             name="name"
             control={control}
-            render={({ field }) => <TextField {...field} label="Name" size="small" sx={{ mt: 2 }} required />}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Name"
+                size="small"
+                sx={{ mt: 2 }}
+                helperText="Leave empty to hide section header"
+              />
+            )}
           />
         </form>
       </DialogContent>
@@ -104,7 +110,9 @@ export const AddSectionFormButton = ({ onSave, nextRank }: { onSave: () => void;
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button onClick={() => setOpen(true)}>add section</Button>
+      <Button onClick={() => setOpen(true)} sx={commonStyles.buttonOnGlass}>
+        add section
+      </Button>
       <SectionFormDialog
         open={open}
         close={() => setOpen(false)}
@@ -148,16 +156,19 @@ const SectionHeader = ({
             mr: 1,
           }}
         >
-          <DragIndicatorIcon />
+          <Tooltip title="Drag to change order">
+            <DragIndicatorIcon />
+          </Tooltip>
         </Box>
         <Typography variant="h6">{section.name}</Typography>
       </Box>
       {editMode && (
         <Box>
-          <Button size="small" onClick={() => setOpenEditDialog(true)}>
+          <Button size="small" onClick={() => setOpenEditDialog(true)} sx={commonStyles.buttonOnGlass}>
             edit
           </Button>
           <Button
+            sx={commonStyles.buttonOnGlass}
             size="small"
             onClick={async () => {
               await deleteSection({ variables: { id: section.id } });
@@ -217,32 +228,19 @@ export const SectionList = ({
   refetchSections: () => Promise<unknown>;
 }) => {
   const { editMode } = useEditMode();
-  const [saveSectionRanks] = useSaveSectionsRankMutation();
-  const client = useApolloClient();
+  const onDragEnd = useDragEndHandler();
 
   if (sections.length == 0) return null;
 
   return (
-    <DragDropContext
-      onDragEnd={async (result) => {
-        if (!result.destination) return;
-        const sectionsCopy = sortDropItems(sections, result);
-
-        client.writeQuery<SectionsQuery>({
-          query: SectionsDocument,
-          data: { sections: sectionsCopy },
-        });
-        await saveSectionRanks({ variables: { idList: sectionsCopy.map((section) => section.id) } });
-        await refetchSections();
-      }}
-    >
-      <Droppable droppableId="droppable-section-list" isDropDisabled={!editMode}>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="section_list" isDropDisabled={!editMode} type={DropTargetType.SECTION}>
         {(provided) => (
           <Box {...provided.droppableProps} ref={provided.innerRef} sx={{ width: "100%" }}>
             {sections.map((section, index) => (
               <Draggable
                 key={section.id}
-                draggableId={`section-item-${section.id}`}
+                draggableId={`section_item-${section.id}`}
                 index={index}
                 isDragDisabled={!editMode}
               >
