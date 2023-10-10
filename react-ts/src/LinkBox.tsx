@@ -160,7 +160,7 @@ const styles = {
     textDecoration: "none",
     userSelect: "none",
     "&:hover": {
-      backgroundColor: "rgba(255,255,255,0.1)",
+      backgroundColor: "rgba(0,0,0,0.2)",
     },
   },
   menuIconContainer: {
@@ -183,7 +183,7 @@ const styles = {
   },
   faviconContainer: {
     mx: 4,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     width: 58,
     height: 58,
     display: "flex",
@@ -255,15 +255,15 @@ export const LinkBox = ({ link, refetchLinks }: { link: Link; refetchLinks: () =
     : `https://www.google.com/s2/favicons?domain=${encodeURIComponent(link.url)}&sz=32`;
 
   return (
-    <Tooltip title="Drag to change order or section" disableHoverListener={!editMode}>
-      <Box sx={styles.linkBox} component={editMode ? "div" : "a"} href={link.url}>
-        {editMode && <LinkMenu link={link} refetchLinks={refetchLinks} />}
+    <Box sx={styles.linkBox} component={editMode ? "div" : "a"} href={link.url}>
+      {editMode && <LinkMenu link={link} refetchLinks={refetchLinks} />}
+      <Tooltip title="Drag to change order or section" disableHoverListener={!editMode}>
         <Box sx={styles.faviconContainer}>
           <img src={faviconImage} alt={link.title} />
         </Box>
-        <Box sx={styles.linkTitle}>{link.title}</Box>
-      </Box>
-    </Tooltip>
+      </Tooltip>
+      <Box sx={styles.linkTitle}>{link.title}</Box>
+    </Box>
   );
 };
 

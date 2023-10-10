@@ -2,6 +2,7 @@ import { BoardBackground, BoardBackgroundType, useEarthPornImagesQuery } from ".
 import { Box, Link, SxProps, Theme } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { Helmet } from "react-helmet";
+import { commonStyles } from "./styles.ts";
 
 const styles = {
   backgroundTitle: {
@@ -10,13 +11,12 @@ const styles = {
     bottom: 0,
     px: 1,
     py: 0.5,
-    backdropFilter: "blur(4px)",
-    textShadow: "1px 1px 2px black",
     borderTopLeftRadius: 4,
-    backgroundColor: "rgba(0,0,0,0.4)",
     display: "flex",
     alignItems: "center",
     gap: 1,
+    ...commonStyles.glass,
+    ...commonStyles.buttonOnGlass,
   },
   imageLink: {
     lineHeight: 0,

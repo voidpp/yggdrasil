@@ -67,6 +67,10 @@ const styles = {
     cursor: "pointer",
     textShadow: "1px 1px 2px black",
     ...commonStyles.glass,
+    transition: "background-color 0.2s",
+    "&:hover": {
+      backgroundColor: "rgba(255,255,255,0.3)",
+    },
   },
 } satisfies Record<string, SxProps<Theme>>;
 
