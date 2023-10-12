@@ -9,7 +9,7 @@ from yggdrasil.components.reddit import get_earth_porn_json, get_earth_porn_imag
 class EarthPornImagesNode(NodeBase):
     config = NodeConfig(
         result_type=List(NonNull(object_type_from_pydantic(EarthPornImage))),
-        cache_expiry_time=timedelta(hours=4),
+        cache_expiry_time=timedelta(hours=24),
     )
 
     async def resolve(self):
