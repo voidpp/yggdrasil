@@ -248,7 +248,7 @@ export const SectionList = ({
                   <Box
                     ref={provided.innerRef}
                     {...provided.draggableProps}
-                    style={{ ...provided.draggableProps.style, marginBottom: 8 }}
+                    style={{ ...provided.draggableProps.style, marginBottom: 12 }}
                   >
                     <SectionPanel
                       section={section}

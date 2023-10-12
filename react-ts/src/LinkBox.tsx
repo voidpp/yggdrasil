@@ -155,12 +155,14 @@ const styles = {
     py: 2,
     pb: 1.5,
     borderRadius: 1,
-    transition: "background-color 0.2s",
+    transition: "background-color 0.2s, transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55)",
     position: "relative",
     textDecoration: "none",
     userSelect: "none",
+    transform: "scale(1,1)",
     "&:hover": {
       backgroundColor: "rgba(0,0,0,0.2)",
+      transform: "scale(1.1,1.1)",
     },
   },
   menuIconContainer: {
