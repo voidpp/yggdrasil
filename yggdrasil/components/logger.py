@@ -1,8 +1,8 @@
 import logging
 
 
-def init_logger(debug: bool):
+def init_logger():
     logging.basicConfig(
-        level=logging.DEBUG if debug else logging.INFO,
+        level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(filename)s:%(lineno)s: %(message)s",
     )

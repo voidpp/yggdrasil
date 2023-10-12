@@ -5,9 +5,7 @@ from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from starlette.routing import Route
-
 from yggdrasil.components.app_config import AppConfig
-from yggdrasil.components.request_context import RequestContext
 from yggdrasil.components.types import RequestScopeKeys
 from yggdrasil.components.user_info import UserInfo
 
@@ -33,6 +31,7 @@ class AuthController:
 
     def register_oauth_clients(self):
         for name, auth_config in self._config.auth_clients.items():
+            logger.info("Register OAuth client: %s", name)
             self._oauth.register(
                 name,
                 server_metadata_url=auth_config.metadata_url,
