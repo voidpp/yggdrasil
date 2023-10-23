@@ -1,50 +1,6 @@
-import { BoardBackground, BoardBackgroundType, useEarthPornImagesQuery } from "./graphql-types-and-hooks.tsx";
-import { Box, Link, SxProps, Theme } from "@mui/material";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { BoardBackground, BoardBackgroundType } from "./graphql-types-and-hooks.tsx";
 import { Helmet } from "react-helmet";
-import { commonStyles } from "./styles.ts";
-
-const styles = {
-  backgroundTitle: {
-    position: "fixed",
-    right: 0,
-    bottom: 0,
-    px: 1,
-    py: 0.5,
-    borderTopLeftRadius: 4,
-    display: "flex",
-    alignItems: "center",
-    gap: 1,
-    ...commonStyles.glass,
-    ...commonStyles.buttonOnGlass,
-  },
-  imageLink: {
-    lineHeight: 0,
-    "&:hover": {
-      color: (theme) => theme.palette.primary.dark,
-    },
-  },
-} satisfies Record<string, SxProps<Theme>>;
-
-export const BoardBackgroundEarthPornImage = () => {
-  const { data: earthPornImagesData } = useEarthPornImagesQuery();
-
-  const image = earthPornImagesData?.earthPornImages?.[0] ?? null;
-
-  if (image === null) return null;
-
-  return (
-    <Box sx={styles.backgroundTitle}>
-      {image.title}
-      <Link href={image.url} target="_blank" sx={styles.imageLink}>
-        <OpenInNewIcon fontSize="small" />
-      </Link>
-      <Helmet>
-        <style>{`body { background-image: url('${image.url}'); }`}</style>
-      </Helmet>
-    </Box>
-  );
-};
+import { BoardBackgroundEarthPornImage } from "./BoardBackgroundEarthPornImage.tsx";
 
 export const BoardBackgroundColor = ({ color }: { color: string }) => {
   return (

@@ -1,17 +1,10 @@
-from graphene import Field, ObjectType, ResolveInfo
+from graphene import ObjectType, ResolveInfo
 from graphql import FieldNode
 from graphql.pyutils.convert_case import camel_to_snake
 from pydantic import BaseModel
 
 from yggdrasil.components.request_context import RequestContext
 from yggdrasil.components.types import RequestScopeKeys
-
-
-def create_nested_field(type_: ObjectType):
-    async def resolver(root, info):
-        return type_()
-
-    return Field(type_, resolver=resolver)
 
 
 def get_field_name_list(node: FieldNode) -> list[str]:
@@ -37,7 +30,7 @@ def create_json_serializable_data(data):
     elif isinstance(data, dict):
         return {key: create_json_serializable_data(val) for key, val in data.items()}
     elif isinstance(data, BaseModel):
-        return data.dict()
+        return data.model_dump()
     elif isinstance(data, ObjectType):
         return data.__dict__
     else:

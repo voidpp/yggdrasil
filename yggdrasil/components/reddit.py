@@ -2,11 +2,9 @@ import logging
 import re
 from dataclasses import dataclass
 
-from pydantic import BaseModel
-
-from async_lru import alru_cache
+from fake_useragent import UserAgent
 from httpx import AsyncClient
-
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -14,13 +12,17 @@ logger = logging.getLogger(__name__)
 class EarthPornImage(BaseModel):
     url: str
     title: str
+    thumbnail_url: str
+    id: str
 
 
-@alru_cache
 async def get_earth_porn_json():
     async with AsyncClient() as client:
         logger.info("Fetching EarthPorn.json from reddit.com")
-        response = await client.get("https://www.reddit.com/r/EarthPorn.json")
+        headers = {
+            "User-Agent": UserAgent().random,
+        }
+        response = await client.get("https://www.reddit.com/r/EarthPorn.json", headers=headers)
         return response.json()
 
 
@@ -54,6 +56,11 @@ def parse_image_title(raw_title: str) -> ImageTitleMetadata:
 
 def get_earth_porn_images(subreddit_json: dict):
     return [
-        EarthPornImage(url=post["data"]["url"], title=parse_image_title(post["data"]["title"]).title)
+        EarthPornImage(
+            url=post["data"]["url"],
+            title=parse_image_title(post["data"]["title"]).title,
+            thumbnail_url=post["data"]["thumbnail"],
+            id=post["data"]["id"],
+        )
         for post in subreddit_json["data"]["children"]
     ]

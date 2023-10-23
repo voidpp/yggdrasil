@@ -9,6 +9,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Mount
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
+
 from yggdrasil.api.schema import create_api_schema
 from yggdrasil.auth_controller import AuthController
 from yggdrasil.components.app_config import load_app_config, AppConfig

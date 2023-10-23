@@ -58,6 +58,8 @@ enum BoardBackgroundType {
 type EarthPornImage {
   url: String!
   title: String!
+  thumbnailUrl: String!
+  id: String!
 }
 
 type Mutation {

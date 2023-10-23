@@ -1,4 +1,5 @@
 import base64
+import logging
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from datetime import timedelta
@@ -18,6 +19,7 @@ from ..request_context import RequestContext
 from ..types import RequestScopeKeys
 
 InputType = TypeVar("InputType")
+logger = logging.getLogger(__name__)
 
 
 class NoArgumentsDefinedError(Exception):
@@ -72,14 +74,7 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
 
     @cached_property
     def field_names(self):
-        field_names = get_field_name_list(self._info.field_nodes[0])
-        return [fn.split(".") for fn in field_names]
-
-    def is_field_queried(self, node_name: str):
-        for node_name_list in self.field_names:
-            if node_name in node_name_list:
-                return True
-        return False
+        return list(sorted(get_field_name_list(self._info.field_nodes[0])))
 
     @property
     def db_session(self) -> AsyncSession:
@@ -129,7 +124,7 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
 
     @cached_property
     def cache_key(self) -> str:
-        key = self.__class__.__name__
+        key = f"{self.__class__.__name__}-{','.join(self.field_names)}"
         if self._kwargs:
             sorted_args = dict(sorted(self._kwargs.items()))
             key += "_" + base64.encodebytes(orjson.dumps(sorted_args)).decode()
@@ -148,7 +143,10 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
             return
 
         if data := await self.request_context.redis.get(self.cache_key):
+            logger.debug("Data served from cache for %s", self.cache_key)
             return orjson.loads(data)
+
+        logger.debug("Cached data not found for %s", self.cache_key)
 
     @classmethod
     def field(cls) -> Field:

@@ -38,8 +38,10 @@ query LinksBySection($sectionId: Int!) {
 
 query EarthPornImages {
     earthPornImages {
+        id
         url
         title
+        thumbnailUrl
     }
 }
 

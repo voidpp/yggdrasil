@@ -26,6 +26,7 @@
     "@mui/material": "^5.14.10",
     "@types/react-beautiful-dnd": "^13.1.5",
     "@types/react-helmet": "^6.1.7",
+    "@types/react-image-gallery": "^1.2.2",
     "apollo3-cache-persist": "^0.14.1",
     "graphql": "^16.8.1",
     "prettier": "^3.0.3",
