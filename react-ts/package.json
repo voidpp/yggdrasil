@@ -29,6 +29,7 @@
     "@types/react-image-gallery": "^1.2.2",
     "apollo3-cache-persist": "^0.14.1",
     "graphql": "^16.8.1",
+    "mui-nested-menu": "^3.2.2",
     "prettier": "^3.0.3",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",

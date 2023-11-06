@@ -1,5 +1,7 @@
 import { DropResult } from "react-beautiful-dnd";
 
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
 export const sortDropItems = <T>(items: T[], dropResult: DropResult): T[] => {
   if (!dropResult.destination) return items;
 
@@ -18,4 +20,5 @@ export const removeTypename = <T extends { __typename?: string }>(object: T): Om
 export enum DropTargetType {
   SECTION = "section",
   LINK = "link",
+  LINK_GROUP = "link_group",
 }

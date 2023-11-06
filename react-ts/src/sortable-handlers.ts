@@ -12,6 +12,7 @@ import {
 import { useApolloClient } from "@apollo/client";
 import { DropResult } from "react-beautiful-dnd";
 import { DropTargetType, removeTypename, sortDropItems } from "./tools.ts";
+import { cleanLinkDataForSave, parseLinkListId } from "./links/link-tools.ts";
 
 export const useSaveSectionsRanksHandler = () => {
   const [saveSectionRank] = useSaveSectionsRankMutation();
@@ -35,16 +36,16 @@ export const useSaveSectionsRanksHandler = () => {
   };
 };
 
-const useLinksCache = () => {
+export const useLinksCache = () => {
   const client = useApolloClient();
 
   return {
-    readLinksFromCache: (sectionId: number) => {
+    readLinksFromCache: (sectionId: number, groupId: Link["linkGroupId"] = null) => {
       const data = client.readQuery<LinksBySectionQuery, LinksBySectionQueryVariables>({
         query: LinksBySectionDocument,
         variables: { sectionId },
       });
-      return [...(data?.links ?? [])];
+      return [...(data?.links.filter((link) => link.linkGroupId == groupId) ?? [])];
     },
     writeLinksToCache: (links: Link[], sectionId: number) => {
       client.writeQuery<LinksBySectionQuery, LinksBySectionQueryVariables>({
@@ -53,24 +54,29 @@ const useLinksCache = () => {
         variables: { sectionId },
       });
     },
+    refetchLinks: async () => {
+      await client.refetchQueries({ include: [LinksBySectionDocument] });
+    },
   };
 };
 
 export const useSaveLinksRanksHandler = () => {
   const [saveLinksRank] = useSaveLinksRankMutation();
   const [saveLink] = useSaveLinkMutation();
-  const client = useApolloClient();
-  const { readLinksFromCache, writeLinksToCache } = useLinksCache();
+  const { readLinksFromCache, writeLinksToCache, refetchLinks } = useLinksCache();
 
   return async (result: DropResult) => {
     if (!result.destination) return;
 
-    const sourceSectionId = parseInt(result.source.droppableId.split("-")[1]);
-    const destinationSectionId = parseInt(result.destination.droppableId.split("-")[1]);
+    const { sectionId: sourceSectionId, groupId } = parseLinkListId(result.source.droppableId);
+    const { sectionId: destinationSectionId } = parseLinkListId(result.destination.droppableId);
 
     if (sourceSectionId == destinationSectionId) {
-      const links = sortDropItems(readLinksFromCache(sourceSectionId), result);
-      writeLinksToCache(links, sourceSectionId);
+      const links = sortDropItems(readLinksFromCache(sourceSectionId, groupId), result);
+      const topLevelLinks = [];
+      if (groupId) topLevelLinks.push(...readLinksFromCache(sourceSectionId));
+
+      writeLinksToCache([...links, ...topLevelLinks], sourceSectionId);
       await saveLinksRank({ variables: { idList: links.map((link) => link.id) } });
     } else {
       const sourceLinks = readLinksFromCache(sourceSectionId);
@@ -80,6 +86,7 @@ export const useSaveLinksRanksHandler = () => {
       destinationLinks.splice(result.destination.index, 0, sourceLink);
 
       const updatedSourceLink = { ...sourceLink, sectionId: destinationSectionId };
+      cleanLinkDataForSave(updatedSourceLink);
 
       writeLinksToCache(sourceLinks, sourceSectionId);
       writeLinksToCache(destinationLinks, destinationSectionId);
@@ -88,7 +95,7 @@ export const useSaveLinksRanksHandler = () => {
       await saveLinksRank({ variables: { idList: destinationLinks.map((link) => link.id) } });
     }
 
-    await client.refetchQueries({ include: [LinksBySectionDocument] });
+    await refetchLinks();
   };
 };
 
@@ -101,7 +108,7 @@ export const useDragEndHandler = () => {
 
     if (type === DropTargetType.SECTION) {
       saveSectionsRanks(result);
-    } else if (type === DropTargetType.LINK) {
+    } else if ([DropTargetType.LINK, DropTargetType.LINK_GROUP].includes(type)) {
       saveLinksRanks(result);
     }
   };

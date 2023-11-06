@@ -1,5 +1,5 @@
 import { Avatar, Box, IconButton, Menu, MenuItem } from "@mui/material";
-import { useCurrentUser } from "./currentUser.tsx";
+import { useCurrentUser } from "./current-user-context.ts";
 import { useState } from "react";
 
 export const UserMenu = () => {

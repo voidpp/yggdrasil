@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from yggdrasil.components.user_info import UserInfo
 from yggdrasil.db_tables import section, link
-from yggdrasil.schema import Link, Section
+from yggdrasil.schema import Link, Section, LinkType
 
 
 class Populator:
@@ -22,11 +22,26 @@ class Populator:
         return result.scalar()
 
     async def add_link(
-        self, section_id: int, title: str = "Google", url: str = "https://google.com", rank: int = 0
+        self,
+        section_id: int,
+        title: str = "Google",
+        url: str = "https://google.com",
+        rank: int = 0,
+        type: LinkType = LinkType.SINGLE,
+        link_group_id: int = None,
     ) -> int:
         query = (
             insert(link)
-            .values({"section_id": section_id, "title": title, "url": url, "rank": rank})
+            .values(
+                {
+                    "section_id": section_id,
+                    "title": title,
+                    "url": url,
+                    "rank": rank,
+                    "link_group_id": link_group_id,
+                    "type": type.value,
+                }
+            )
             .returning(link.c.id)
         )
 

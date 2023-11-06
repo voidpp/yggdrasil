@@ -1,30 +1,17 @@
-import { useState } from "react";
-import {
-  Section,
-  useDeleteSectionMutation,
-  useLinksBySectionQuery,
-  useSaveSectionMutation,
-} from "./graphql-types-and-hooks.tsx";
-import { Controller, useForm } from "react-hook-form";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  SxProps,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import { AddLinkFormButton, LinkBoxList } from "./LinkBox.tsx";
-import { useEditMode } from "./editMode.tsx";
+import { useMemo, useState } from "react";
+import { Link, Section, useDeleteSectionMutation, useLinksBySectionQuery } from "../graphql-types-and-hooks.tsx";
+import { Box, Button, SxProps, Theme, Tooltip, Typography } from "@mui/material";
+import { LinkList } from "../links/link-list.tsx";
 import { DragDropContext, Draggable, DraggableProvided, Droppable } from "react-beautiful-dnd";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { DropTargetType, removeTypename } from "./tools.ts";
-import { useDragEndHandler } from "./sortableHandlers.ts";
-import { commonStyles } from "./styles.ts";
+import { DropTargetType, removeTypename } from "../tools.ts";
+import { useDragEndHandler } from "../sortable-handlers.ts";
+import { commonStyles } from "../styles.ts";
+import { LinkNode } from "../types.ts";
+import { useEditMode } from "../edit-mode/edit-mode-context.ts";
+import { SectionFormDialog } from "./section-form.tsx";
+import { AddLinkFormButton } from "../links/link-form.tsx";
+import { LinksSectionContext } from "../links/link-tools.ts";
 
 const styles = {
   sectionContainer: {
@@ -35,93 +22,9 @@ const styles = {
     borderRadius: 2,
     width: "100%",
     position: "relative",
-    // Why is this hacky solution for background blur?
-    // The most stupid bug I've ever seen: https://github.com/atlassian/react-beautiful-dnd/issues/1826
-    "&::before": {
-      borderRadius: 2,
-      top: 0,
-      left: 0,
-      content: '""',
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      zIndex: -1,
-      ...commonStyles.glass,
-    },
+    ...commonStyles.editModePanel,
   },
-} satisfies Record<string, SxProps>;
-
-type SectionFormData = {
-  id?: number;
-  name: string;
-  rank: number;
-};
-
-const SectionFormDialog = ({
-  open,
-  close,
-  sectionData,
-  onSave,
-}: {
-  open: boolean;
-  close: () => void;
-  sectionData: SectionFormData;
-  onSave: () => void;
-}) => {
-  const [saveSection] = useSaveSectionMutation();
-  const { control, handleSubmit, reset } = useForm<SectionFormData>({ defaultValues: sectionData });
-
-  const onSubmit = async (data: SectionFormData) => {
-    await saveSection({ variables: { section: data } });
-    if (!sectionData.id) reset();
-    close();
-    onSave();
-  };
-
-  return (
-    <Dialog open={open}>
-      <DialogTitle>Add section</DialogTitle>
-      <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Controller
-            name="name"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Name"
-                size="small"
-                sx={{ mt: 2 }}
-                helperText="Leave empty to hide section header"
-              />
-            )}
-          />
-        </form>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleSubmit(onSubmit)}>Save</Button>
-        <Button onClick={close}>Close</Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
-
-export const AddSectionFormButton = ({ onSave, nextRank }: { onSave: () => void; nextRank: number }) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Button onClick={() => setOpen(true)} sx={commonStyles.buttonOnGlass}>
-        add section
-      </Button>
-      <SectionFormDialog
-        open={open}
-        close={() => setOpen(false)}
-        sectionData={{ name: "", rank: nextRank }}
-        onSave={onSave}
-      />
-    </>
-  );
-};
+} satisfies Record<string, SxProps<Theme>>;
 
 const SectionHeader = ({
   section,
@@ -149,6 +52,7 @@ const SectionHeader = ({
         <Box
           {...dragHandleProps}
           sx={{
+            color: "primary.main",
             width: editMode ? "auto" : 0,
             height: editMode ? "auto" : 0,
             overflow: "hidden",
@@ -160,7 +64,9 @@ const SectionHeader = ({
             <DragIndicatorIcon />
           </Tooltip>
         </Box>
-        <Typography variant="h6">{section.name}</Typography>
+        <Typography variant="h6" sx={{ textShadow: "1px 1px 4px black" }}>
+          {section.name}
+        </Typography>
       </Box>
       {editMode && (
         <Box>
@@ -189,6 +95,12 @@ const SectionHeader = ({
   );
 };
 
+const buildLinkTree = (links: Link[], parentLinkId?: number): LinkNode[] => {
+  return links
+    .filter((link) => link.linkGroupId == parentLinkId)
+    .map((link) => ({ ...link, children: buildLinkTree(links, link.id) }));
+};
+
 const SectionPanel = ({
   section,
   refetchSections,
@@ -200,23 +112,25 @@ const SectionPanel = ({
 }) => {
   const { editMode } = useEditMode();
   const { data: linksData, refetch: refetchLinks } = useLinksBySectionQuery({ variables: { sectionId: section.id } });
-  const links = linksData?.links ?? [];
+  const links = useMemo(() => buildLinkTree(linksData?.links ?? []), [linksData?.links]);
 
   return (
-    <Box sx={styles.panel}>
-      <SectionHeader section={section} refetchSections={refetchSections} dragHandleProps={dragHandleProps} />
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <LinkBoxList links={links} refetchLinks={refetchLinks} sectionId={section.id} />
-        {editMode && (
-          <AddLinkFormButton
-            sx={{ ml: 1 }}
-            onSave={refetchLinks}
-            nextRank={Math.max(...links.map((link) => link.rank), 0) + 1}
-            sectionId={section.id}
-          />
-        )}
+    <LinksSectionContext.Provider value={{ linkList: linksData?.links ?? [], linkTree: links, refetchLinks }}>
+      <Box sx={{ ...styles.panel, ...(editMode ? {} : commonStyles.glass) }}>
+        <SectionHeader section={section} refetchSections={refetchSections} dragHandleProps={dragHandleProps} />
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <LinkList links={links} sectionId={section.id} />
+          {editMode && (
+            <AddLinkFormButton
+              sx={{ ml: links.length ? 1 : 0 }}
+              onSave={refetchLinks}
+              nextRank={Math.max(...links.map((link) => link.rank), 0) + 1}
+              sectionId={section.id}
+            />
+          )}
+        </Box>
       </Box>
-    </Box>
+    </LinksSectionContext.Provider>
   );
 };
 

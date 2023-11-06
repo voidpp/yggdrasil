@@ -90,18 +90,23 @@ def create_class_property_dict(
             properties[property_name] = _TYPE_MAP_SCALARS[type_](required=required, description=description)
             continue
 
-        if type(type_) == enum.EnumMeta:
+        if type(type_) is enum.EnumMeta:
             graphene_enum_type = create_graphene_enum(type_)
             properties[property_name] = graphene_enum_type(required=required, description=description)
             continue
 
-        if get_origin(type_) == list:
+        type_origin = get_origin(type_)
+
+        if type_origin == list:
             list_item_class = _create_list_item_class(type_, sub_type)
             properties[property_name] = List(NonNull(list_item_class), required=required, description=description)
             continue
 
-        if get_origin(type_) == Annotated:
+        if type_origin == Annotated:
             type_ = type_.__origin__
+        elif type_origin is not None:
+            # this is an insanely wild guess
+            type_ = get_args(type_)[0]
 
         type_base = get_base_scalar_type(type_)
         if type_base in _TYPE_MAP_SCALARS:

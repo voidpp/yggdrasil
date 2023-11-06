@@ -1,6 +1,6 @@
 from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, Enum
 
-from yggdrasil.schema import BoardBackgroundType
+from yggdrasil.schema import BoardBackgroundType, LinkType
 
 meta = MetaData()
 
@@ -37,4 +37,6 @@ link = Table(
     Column("favicon", String),
     Column("section_id", Integer, ForeignKey("section.id", ondelete="CASCADE")),
     Column("rank", Integer),
+    Column("type", Enum(LinkType, native_enum=False), nullable=False),
+    Column("link_group_id", Integer, ForeignKey("link.id", ondelete="CASCADE")),
 )

@@ -3,7 +3,7 @@ import pytest
 from yggdrasil.api.types import get_auth_error
 
 query = """
-mutation SaveLinkRank($linkIds: [Int]!) { 
+mutation SaveLinkRank($linkIds: [Int!]!) { 
     saveLinksRanks(linkIds: $linkIds) { 
         errors { 
             msg 

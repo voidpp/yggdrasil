@@ -3,7 +3,7 @@ import {
   useBoardSettingsQuery,
   useEarthPornImagesQuery,
   useSaveBoardSettingsMutation,
-} from "./graphql-types-and-hooks.tsx";
+} from "../graphql-types-and-hooks.tsx";
 import { useState } from "react";
 import {
   Box,
@@ -29,7 +29,7 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Helmet } from "react-helmet";
-import { commonStyles } from "./styles.ts";
+import { commonStyles } from "../styles.ts";
 import InfoIcon from "@mui/icons-material/Info";
 
 const styles = {

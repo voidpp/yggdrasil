@@ -1,6 +1,6 @@
-import { BoardBackground, BoardBackgroundType } from "./graphql-types-and-hooks.tsx";
+import { BoardBackground, BoardBackgroundType } from "../graphql-types-and-hooks.tsx";
 import { Helmet } from "react-helmet";
-import { BoardBackgroundEarthPornImage } from "./BoardBackgroundEarthPornImage.tsx";
+import { BoardBackgroundEarthPornImage } from "./board-background-earth-porn-image.tsx";
 
 export const BoardBackgroundColor = ({ color }: { color: string }) => {
   return (

@@ -1,6 +1,6 @@
-import { Login } from "./Login.tsx";
-import { Board } from "./Board.tsx";
-import { useCurrentUser } from "./currentUser.tsx";
+import { Login } from "./user/login.tsx";
+import { Board } from "./board/board.tsx";
+import { useCurrentUser } from "./user/current-user-context.ts";
 
 export const App = () => {
   const { currentUser } = useCurrentUser();

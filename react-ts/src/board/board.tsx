@@ -4,7 +4,7 @@ import {
   useBoardSettingsQuery,
   useSaveBoardSettingsMutation,
   useSectionsQuery,
-} from "./graphql-types-and-hooks.tsx";
+} from "../graphql-types-and-hooks.tsx";
 import {
   Box,
   Button,
@@ -16,19 +16,20 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Switch,
   SxProps,
   TextField,
   Theme,
   Typography,
 } from "@mui/material";
-import { AddSectionFormButton, SectionList } from "./Section.tsx";
-import { useEditMode } from "./editMode.tsx";
-import { UserMenu } from "./UserMenu.tsx";
+import { SectionList } from "../sections/section-list.tsx";
+import { UserMenu } from "../user/user-menu.tsx";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { BoardBackgroundStyle } from "./BoardBackgroundStyle.tsx";
-import { commonStyles } from "./styles.ts";
+import { BoardBackgroundStyle } from "./board-background-style.tsx";
+import { commonStyles } from "../styles.ts";
+import { useEditMode } from "../edit-mode/edit-mode-context.ts";
+import { EditModeControl } from "../edit-mode/edit-mode-widgets.tsx";
+import { AddSectionFormButton } from "../sections/section-form.tsx";
 
 const styles = {
   boardContainer: {
@@ -55,34 +56,9 @@ const styles = {
     gap: 3,
     width: "100%",
     justifyContent: "space-between",
-    textShadow: "1px 1px 2px black",
-    ...commonStyles.glass,
-  },
-  editModeControl: {
-    m: 1,
-    pl: 1,
-    display: "flex",
-    alignItems: "center",
-    borderRadius: 2,
-    cursor: "pointer",
-    textShadow: "1px 1px 2px black",
-    ...commonStyles.glass,
-    transition: "background-color 0.2s",
-    "&:hover": {
-      backgroundColor: "rgba(255,255,255,0.3)",
-    },
+    ...commonStyles.editModePanel,
   },
 } satisfies Record<string, SxProps<Theme>>;
-
-const EditModeControl = () => {
-  const { editMode, setEditMode } = useEditMode();
-
-  return (
-    <Box sx={styles.editModeControl} onClick={() => setEditMode(!editMode)}>
-      Edit: <Switch checked={editMode} size="small" sx={{ m: 0.5 }} />
-    </Box>
-  );
-};
 
 type BoardSettingsFormData = {
   backgroundType: BoardBackgroundType;

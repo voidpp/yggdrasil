@@ -1,6 +1,8 @@
 import logging
 from time import time
+from typing import Callable
 
+from redis import Redis
 from redis import asyncio as aioredis
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
@@ -38,7 +40,11 @@ class LoggedGraphQLApp(GraphQLApp):
         return result
 
 
-def get_app(config: AppConfig = None, session_middleware: type = SessionMiddleware):
+def get_app(
+    config: AppConfig = None,
+    session_middleware: type = SessionMiddleware,
+    redis_client_factory: Callable[[str], Redis] = aioredis.from_url,
+):
     env = environment()
 
     if config is None:
@@ -52,7 +58,7 @@ def get_app(config: AppConfig = None, session_middleware: type = SessionMiddlewa
 
     auth = AuthController(config)
     auth.register_oauth_clients()
-    redis = aioredis.from_url(config.redis_url)
+    redis = redis_client_factory(config.redis_url)
 
     request_context = RequestContext(Database(config.database_url), auth, config, redis)
 

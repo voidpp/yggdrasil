@@ -33,6 +33,8 @@ query LinksBySection($sectionId: Int!) {
         favicon
         rank
         sectionId
+        type
+        linkGroupId
     }
 }
 

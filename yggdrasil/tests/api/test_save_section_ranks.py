@@ -1,11 +1,9 @@
 import pytest
-from sqlalchemy import select
 
 from yggdrasil.api.types import get_auth_error
-from yggdrasil.db_tables import section
 
 query = """
-mutation SaveSectionRank($sectionIds: [Int]!) { 
+mutation SaveSectionRank($sectionIds: [Int!]!) { 
     saveSectionsRanks(sectionIds: $sectionIds) { 
         errors { 
             msg 

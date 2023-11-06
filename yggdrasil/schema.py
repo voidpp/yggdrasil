@@ -9,13 +9,20 @@ class Section(BaseModel):
     rank: int
 
 
+class LinkType(Enum):
+    SINGLE = "SINGLE"
+    GROUP = "GROUP"
+
+
 class Link(BaseModel):
     id: int
     title: str
-    url: str
+    url: str = None
     favicon: str = None
     section_id: int
     rank: int
+    type: LinkType
+    link_group_id: int = None
 
 
 class BoardBackgroundType(Enum):

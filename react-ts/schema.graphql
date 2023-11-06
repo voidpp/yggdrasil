@@ -33,10 +33,18 @@ type Section {
 type Link {
   id: Int!
   title: String!
-  url: String!
+  url: String
   favicon: String
   sectionId: Int!
   rank: Int!
+  type: LinkType!
+  linkGroupId: Int
+}
+
+"""An enumeration."""
+enum LinkType {
+  SINGLE
+  GROUP
 }
 
 type BoardSettings {
@@ -100,10 +108,12 @@ input SectionInput {
 input LinkInput {
   id: Int
   title: String!
-  url: String!
+  url: String
   favicon: String
   sectionId: Int!
   rank: Int!
+  type: LinkType!
+  linkGroupId: Int
 }
 
 input BoardSettingsInput {

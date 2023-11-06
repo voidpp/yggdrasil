@@ -1,4 +1,4 @@
-import { useAuthClientsQuery } from "./graphql-types-and-hooks.tsx";
+import { useAuthClientsQuery } from "../graphql-types-and-hooks.tsx";
 import {
   Box,
   Dialog,
@@ -19,21 +19,11 @@ export const Login = () => {
       <DialogContent>
         <List>
           {data?.authClients?.map((client) => (
-            <ListItemButton
-              key={client?.name}
-              href={`/auth/login/${client?.name}`}
-            >
+            <ListItemButton key={client?.name} href={`/auth/login/${client?.name}`}>
               <ListItemIcon>
-                <Box
-                  component="img"
-                  src={client?.icon}
-                  alt={client?.name}
-                  sx={{ width: 32 }}
-                />
+                <Box component="img" src={client?.icon} alt={client?.name} sx={{ width: 32 }} />
               </ListItemIcon>
-              <ListItemText sx={{ textTransform: "capitalize" }}>
-                {client?.name}
-              </ListItemText>
+              <ListItemText sx={{ textTransform: "capitalize" }}>{client?.name}</ListItemText>
             </ListItemButton>
           ))}
         </List>

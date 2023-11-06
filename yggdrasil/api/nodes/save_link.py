@@ -1,3 +1,4 @@
+from asyncio import gather
 from typing import Annotated
 
 from pydantic import BaseModel, HttpUrl, StringConstraints, ValidationError
@@ -7,15 +8,18 @@ from yggdrasil.api.types import CommonMutationResult, get_auth_error, Error
 from yggdrasil.components.graphene.node_base import NodeConfig, NodeValidationError, NodeBase
 from yggdrasil.components.graphene.pydantic import object_type_from_pydantic
 from yggdrasil.db_tables import link, section
+from yggdrasil.schema import LinkType
 
 
 class Link(BaseModel):
     id: int = None
     title: Annotated[str, StringConstraints(min_length=2)]
-    url: HttpUrl
-    favicon: str = None  # TODO: optional HttpUrl: frontend should omit if empty string
+    url: HttpUrl = None
+    favicon: HttpUrl = None
     section_id: int
     rank: int
+    type: LinkType
+    link_group_id: int | None = None
 
 
 class SaveLinkValidator(BaseModel):
@@ -55,15 +59,28 @@ class SaveLinkNode(NodeBase[SaveLinkValidator]):
         if (await self.db_session.execute(query)).scalar() != 1:
             raise NodeValidationError(CommonMutationResult(errors=[Error(msg=f"Unknown section id")]))
 
+    async def _get_current_section_id(self) -> int:
+        query = select(link.c.section_id).where(link.c.id == self.args.link.id)
+        result = await self.db_session.execute(query)
+        return result.scalar()
+
     async def resolve(self):
         link_data = self.args.link.model_dump(exclude_unset=True, mode="json")
+        queries = []
 
         if self.args.link.id is None:
-            query = insert(link).values(link_data)
+            queries.append(insert(link).values(link_data))
         else:
-            query = update(link).where(link.c.id == self.args.link.id).values(link_data)
+            if await self._get_current_section_id() != self.args.link.section_id:
+                queries.append(
+                    update(link)
+                    .where(link.c.link_group_id == self.args.link.id)
+                    .values({"section_id": self.args.link.section_id})
+                )
 
-        await self.db_session.execute(query)
+            queries.append(update(link).where(link.c.id == self.args.link.id).values(link_data))
+
+        await gather(*[self.db_session.execute(query) for query in queries])
         await self.db_session.commit()
 
         return CommonMutationResult()
