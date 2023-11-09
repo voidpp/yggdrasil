@@ -173,7 +173,7 @@ export const Board = () => {
       <Box sx={styles.board}>
         {editMode && (
           <Box sx={styles.boardTitle}>
-            <Typography variant="h5">Yggdrasil</Typography>
+            <Typography variant="h5">Edit mode</Typography>
             <Box>
               {boardSettingsData?.boardSettings && (
                 <BoardSettingsDialogButton settings={boardSettingsData?.boardSettings} onSave={refetchBoardSettings} />

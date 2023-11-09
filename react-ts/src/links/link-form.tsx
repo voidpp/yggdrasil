@@ -80,7 +80,7 @@ export const SaveLinkFormDialog = ({
   const watchLinkType = watch("type");
 
   return (
-    <Dialog open={open} onClose={close}>
+    <Dialog open={open} onClose={close} TransitionProps={{ onExited: () => reset() }}>
       <DialogTitle>{linkData.id ? "Save" : "Create"} link</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>

@@ -70,7 +70,7 @@ const LinkGroup = ({ link: { children, id, sectionId, title } }: { link: LinkNod
           <AddLinkFormButton
             sx={{ ml: children.length ? 1 : 0 }}
             onSave={refetchLinks}
-            nextRank={0}
+            nextRank={Math.max(...children.map((link) => link.rank), 0) + 1}
             sectionId={sectionId}
             linkGroupId={id}
           />
