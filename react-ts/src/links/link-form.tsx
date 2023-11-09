@@ -36,6 +36,13 @@ const linkTypeTitle: Record<LinkType, string> = {
   [LinkType.Group]: "Group",
 };
 
+const formatLinkForForm = (data: LinkFormData): LinkFormData => {
+  const copy = { ...data };
+  if (copy.url == null) copy.url = "";
+  if (copy.favicon == null) copy.favicon = "";
+  return copy;
+};
+
 export const SaveLinkFormDialog = ({
   open,
   close,
@@ -47,7 +54,9 @@ export const SaveLinkFormDialog = ({
   linkData: LinkFormData;
   onSave: () => void;
 }) => {
-  const { control, handleSubmit, reset, setError, watch } = useForm<LinkFormData>({ defaultValues: linkData });
+  const { control, handleSubmit, reset, setError, watch } = useForm<LinkFormData>({
+    defaultValues: async () => formatLinkForForm(linkData),
+  });
   const [saveLink] = useSaveLinkMutation();
 
   const onSubmit = async (data: LinkFormData) => {

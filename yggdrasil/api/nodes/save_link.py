@@ -1,7 +1,8 @@
 from asyncio import gather
 from typing import Annotated
 
-from pydantic import BaseModel, HttpUrl, StringConstraints, ValidationError
+from pydantic import BaseModel, HttpUrl, StringConstraints, ValidationError, field_validator
+from pydantic_core.core_schema import FieldValidationInfo
 from sqlalchemy import insert, update, select, func
 
 from yggdrasil.api.types import CommonMutationResult, get_auth_error, Error
@@ -12,14 +13,28 @@ from yggdrasil.schema import LinkType
 
 
 class Link(BaseModel):
-    id: int = None
+    id: int | None = None
     title: Annotated[str, StringConstraints(min_length=2)]
-    url: HttpUrl = None
-    favicon: HttpUrl = None
+    type: LinkType
+    url: HttpUrl | None = None
+    favicon: HttpUrl | None = None
     section_id: int
     rank: int
-    type: LinkType
     link_group_id: int | None = None
+
+    @field_validator("url")
+    @classmethod
+    def validate_url(cls, value: HttpUrl, info: FieldValidationInfo):
+        if value is None and info.data["type"] == LinkType.SINGLE:
+            raise ValueError("url is mandatory if type is single")
+        return value
+
+    @field_validator("favicon")
+    @classmethod
+    def validate_favicon(cls, value: HttpUrl, info: FieldValidationInfo):
+        if value is None and info.data["type"] == LinkType.GROUP:
+            raise ValueError("favicon is mandatory if type is group")
+        return value
 
 
 class SaveLinkValidator(BaseModel):

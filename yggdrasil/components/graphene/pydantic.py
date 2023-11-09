@@ -72,6 +72,7 @@ def create_class_property_dict(
     sub_type: Type[BaseType] = ObjectType,
     ignored_fields: list[str] = None,
 ) -> dict:
+    # TODO: rewrite this stuff, the typing.Annotated stuff is messy
     properties = {}
     collector = AnnotationsCollector(model)
     collector.collect()
@@ -107,6 +108,10 @@ def create_class_property_dict(
         elif type_origin is not None:
             # this is an insanely wild guess
             type_ = get_args(type_)[0]
+
+        type_origin = get_origin(type_)
+        if type_origin == Annotated:
+            type_ = type_.__origin__
 
         type_base = get_base_scalar_type(type_)
         if type_base in _TYPE_MAP_SCALARS:

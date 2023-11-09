@@ -21,6 +21,7 @@ def generate_link_vars(extra_data: dict = None):
         "sectionId": 1,
         "rank": 0,
         "type": LinkType.SINGLE.value,
+        "favicon": None,
     }
 
     if extra_data:
