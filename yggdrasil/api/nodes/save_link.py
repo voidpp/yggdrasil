@@ -17,7 +17,7 @@ class Link(BaseModel):
     title: Annotated[str, StringConstraints(min_length=2)]
     type: LinkType
     url: HttpUrl | None = None
-    favicon: HttpUrl | None = None
+    favicon: str | None = None
     section_id: int
     rank: int
     link_group_id: int | None = None
@@ -26,15 +26,19 @@ class Link(BaseModel):
     @classmethod
     def validate_url(cls, value: HttpUrl, info: FieldValidationInfo):
         if value is None and info.data["type"] == LinkType.SINGLE:
-            raise ValueError("url is mandatory if type is single")
+            raise AssertionError("url is mandatory if type is single")
         return value
 
     @field_validator("favicon")
     @classmethod
-    def validate_favicon(cls, value: HttpUrl, info: FieldValidationInfo):
+    def validate_favicon(cls, value: str, info: FieldValidationInfo):
         if value is None and info.data["type"] == LinkType.GROUP:
-            raise ValueError("favicon is mandatory if type is group")
-        return value
+            raise AssertionError("favicon is mandatory if type is group")
+
+        if value is None or value.startswith("http") or value.startswith("data:image/"):
+            return value
+
+        raise AssertionError("favicon should starts with http or data:image")
 
 
 class SaveLinkValidator(BaseModel):

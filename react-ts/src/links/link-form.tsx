@@ -1,4 +1,4 @@
-import { Controller, useForm } from "react-hook-form";
+import { Controller, ControllerFieldState, ControllerRenderProps, useForm } from "react-hook-form";
 import { LinkType, useSaveLinkMutation } from "../graphql-types-and-hooks.tsx";
 import {
   Box,
@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormHelperText,
   IconButton,
   InputLabel,
   MenuItem,
@@ -16,7 +17,7 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cleanLinkDataForSave } from "./link-tools.ts";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -134,19 +135,7 @@ export const SaveLinkFormDialog = ({
             <Controller
               name="favicon"
               control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Favicon"
-                  size="small"
-                  required={watchLinkType == LinkType.Group}
-                  error={!!fieldState.error}
-                  helperText={
-                    fieldState.error?.message ??
-                    (watchLinkType == LinkType.Single ? "Optional. Leave empty to fetch from the URL" : "")
-                  }
-                />
-              )}
+              render={(props) => <FaviconField {...props} linkType={watchLinkType} />}
             />
           </Box>
         </form>
@@ -158,6 +147,89 @@ export const SaveLinkFormDialog = ({
     </Dialog>
   );
 };
+
+type IconFormat = "url" | "base64";
+
+type FaviconFieldProps = {
+  field: ControllerRenderProps<LinkFormData, "favicon">;
+  fieldState: ControllerFieldState;
+  linkType: LinkType;
+};
+
+const getPreviewImage = (value: string | null | undefined, format: IconFormat): string | null => {
+  if (!value) return null;
+
+  if (value.startsWith("data:image/") && format == "base64") return value;
+
+  if (value.startsWith("http") && format == "url") return value;
+
+  return null;
+};
+
+const FaviconField = ({ field, fieldState, linkType }: FaviconFieldProps) => {
+  const [iconFormat, setIconFormat] = useState<IconFormat>(field.value?.startsWith("data:image/") ? "base64" : "url");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const preview = getPreviewImage(field.value, iconFormat);
+
+  return (
+    <Box>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Select value={iconFormat} onChange={(ev) => setIconFormat(ev.target.value as IconFormat)} size="small">
+          <MenuItem value="url">URL</MenuItem>
+          <MenuItem value="base64">Image</MenuItem>
+        </Select>
+        {iconFormat == "url" ? (
+          <TextField
+            {...field}
+            label="Favicon"
+            size="small"
+            required={linkType == LinkType.Group}
+            error={!!fieldState.error}
+            fullWidth
+          />
+        ) : (
+          <>
+            <Button
+              variant="contained"
+              onClick={() => {
+                if (fileInputRef.current) fileInputRef.current.click();
+              }}
+            >
+              Upload new
+            </Button>
+            <input
+              hidden
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={async (event) => {
+                if (event.target.files) {
+                  const file = event.target.files[0];
+                  if (file.size > 32 * 1024) alert("uristen, very big (max 32kb)");
+                  field.onChange(await toBase64(file));
+                }
+              }}
+            />
+          </>
+        )}
+        {preview ? <Box component="img" src={preview} alt="yey" sx={{ width: 24, height: 24 }} /> : null}
+      </Box>
+      <FormHelperText sx={{ ml: 1 }}>
+        {fieldState.error?.message ??
+          (linkType == LinkType.Single ? "Optional. Leave empty to fetch from the URL" : "")}
+      </FormHelperText>
+    </Box>
+  );
+};
+
+const toBase64 = (file: File) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+  });
 
 export const AddLinkFormButton = ({
   onSave,
