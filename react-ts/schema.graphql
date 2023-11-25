@@ -108,11 +108,11 @@ input SectionInput {
 input LinkInput {
   id: Int
   title: String!
+  type: LinkType!
   url: String
   favicon: String
   sectionId: Int!
   rank: Int!
-  type: LinkType!
   linkGroupId: Int
 }
 

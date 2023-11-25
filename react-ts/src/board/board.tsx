@@ -30,6 +30,7 @@ import { commonStyles } from "../styles.ts";
 import { useEditMode } from "../edit-mode/edit-mode-context.ts";
 import { EditModeControl } from "../edit-mode/edit-mode-widgets.tsx";
 import { AddSectionFormButton } from "../sections/section-form.tsx";
+import { AppButton } from "../apps/app-button.tsx";
 
 const styles = {
   boardContainer: {
@@ -167,7 +168,8 @@ export const Board = () => {
       <Box sx={{ position: "absolute", top: 0, left: 0 }}>
         <EditModeControl />
       </Box>
-      <Box sx={{ position: "absolute", top: 0, right: 0 }}>
+      <Box sx={{ position: "absolute", top: 0, right: 0, display: "flex", alignItems: "center" }}>
+        <AppButton />
         <UserMenu />
       </Box>
       <Box sx={styles.board}>

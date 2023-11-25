@@ -2,7 +2,7 @@ import { ReactNode, useState } from "react";
 import { localStorage } from "../local-storage.ts";
 import { EditModeContext, useEditMode } from "./edit-mode-context.ts";
 import { Box, SxProps, Theme, Tooltip } from "@mui/material";
-import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
+import DesignServicesIcon from "@mui/icons-material/DesignServices";
 
 const styles = {
   container: {
@@ -51,7 +51,7 @@ export const EditModeControl = () => {
         }}
         onClick={() => setEditMode(!editMode)}
       >
-        <AppRegistrationIcon fontSize="large" sx={{ filter: "drop-shadow(0px 0px 2px black)" }} />
+        <DesignServicesIcon fontSize="large" sx={{ filter: "drop-shadow(0px 0px 2px black)" }} />
       </Box>
     </Tooltip>
   );
