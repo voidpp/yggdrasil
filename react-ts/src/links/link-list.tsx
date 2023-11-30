@@ -39,6 +39,7 @@ const styles = {
   linkList: {
     display: "flex",
     alignItems: "center",
+    flexWrap: "wrap",
   },
   faviconContainer: {
     mx: 4,

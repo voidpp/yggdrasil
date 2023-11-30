@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "yggdrasil"
-version = "1.8.0"
+version = "1.8.1"
 description = "Yggdrasil"
 authors = ["Lajos Santa <santa.lajos@gmail.com>"]
 license = "MIT"

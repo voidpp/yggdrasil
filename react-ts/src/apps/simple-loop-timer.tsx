@@ -18,7 +18,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 
 const arraySum = (array: number[]) => array.reduce((acc, curr) => acc + curr, 0);
 
-const progressWidth = 400;
+const progressWidth = "100%";
 
 const Timer = ({ lengths, maxCycle }: { lengths: number[]; maxCycle: number }) => {
   const [time, setTime] = useState(0);
@@ -76,7 +76,7 @@ const Timer = ({ lengths, maxCycle }: { lengths: number[]; maxCycle: number }) =
         <Divider sx={{ my: 2 }} />
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Box>
-            Time: <Timedelta value={time} /> / <Timedelta value={cycleTime * maxCycle} />
+            Time: <Timedelta value={time + cycleTime * cycles} /> / <Timedelta value={cycleTime * maxCycle} />
           </Box>
           <Box>
             <Button onClick={resetCycles}>reset</Button>
@@ -85,7 +85,7 @@ const Timer = ({ lengths, maxCycle }: { lengths: number[]; maxCycle: number }) =
         <LinearProgress
           variant="determinate"
           sx={{ width: progressWidth }}
-          value={(time / (cycleTime * maxCycle)) * 100}
+          value={((time + cycleTime * cycles) / (cycleTime * maxCycle)) * 100}
         />
       </Box>
     </Box>
@@ -95,7 +95,7 @@ const Timer = ({ lengths, maxCycle }: { lengths: number[]; maxCycle: number }) =
 const TimerDialogContent = () => {
   return (
     <DialogContent>
-      <Timer lengths={[4, 8]} maxCycle={10} />
+      <Timer lengths={[4, 1, 8, 1]} maxCycle={10} />
     </DialogContent>
   );
 };
@@ -106,7 +106,7 @@ export const SimpleLoopTimer = () => {
   return (
     <>
       <AppIcon icon={TimerIcon} title="Loop timer" onOpen={() => setOpen(true)} />
-      <Dialog open={open} onClose={() => setOpen(false)}>
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>Loop timer</DialogTitle>
         <TimerDialogContent />
         <DialogActions>

@@ -59,6 +59,14 @@ const styles = {
     justifyContent: "space-between",
     ...commonStyles.editModePanel,
   },
+  userMenu: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    display: "flex",
+    alignItems: "center",
+    zIndex: (theme) => theme.zIndex.modal - 1,
+  },
 } satisfies Record<string, SxProps<Theme>>;
 
 type BoardSettingsFormData = {
@@ -161,18 +169,18 @@ export const Board = () => {
   const sections = sectionsData?.sections ?? [];
 
   return (
-    <Box sx={styles.boardContainer}>
+    <Box sx={styles.boardContainer} data-name="board-container">
       {boardSettingsData?.boardSettings?.background && (
         <BoardBackgroundStyle settings={boardSettingsData?.boardSettings?.background} />
       )}
-      <Box sx={{ position: "absolute", top: 0, left: 0 }}>
+      <Box sx={{ position: "absolute", top: 0, left: 0, zIndex: (theme) => theme.zIndex.modal - 1 }}>
         <EditModeControl />
       </Box>
-      <Box sx={{ position: "absolute", top: 0, right: 0, display: "flex", alignItems: "center" }}>
+      <Box sx={styles.userMenu}>
         <AppButton />
         <UserMenu />
       </Box>
-      <Box sx={styles.board}>
+      <Box sx={styles.board} data-name="board">
         {editMode && (
           <Box sx={styles.boardTitle}>
             <Typography variant="h5">Edit mode</Typography>
