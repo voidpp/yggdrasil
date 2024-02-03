@@ -18,11 +18,7 @@ class AppConfig(BaseModel):
     session_secret: str
 
 
-def load_app_config(file_path: str):
+def load_app_config(file_path: str) -> AppConfig:
     file = Path(file_path)
-
     content = safe_load(file.open())
-
-    config = AppConfig(**content)
-
-    return config
+    return AppConfig(**content)

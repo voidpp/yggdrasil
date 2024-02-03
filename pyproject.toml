@@ -8,31 +8,41 @@ readme = "README.md"
 include = ["yggdrasil/ui-dist/**/*.*"]
 
 [tool.poetry.dependencies]
-python = "^3.11"
-starlette = "^0.31.1"
-graphene = "^3.3"
-starlette-graphene3 = "^0.6.0"
-pydantic = "^2.3.0"
-uvicorn = "^0.23.2"
-sqlalchemy = "^2.0.21"
-orjson = "^3.9.7"
+python = "^3.12"
 alembic = "^1.12.0"
 asyncpg = "^0.28.0"
 authlib = "^1.2.1"
-itsdangerous = "^2.1.2"
+fake-useragent = "^1.3.0"
+graphene = "^3.3"
 httpx = "^0.25.0"
+itsdangerous = "^2.1.2"
+orjson = "^3.9.7"
+pydantic = "^2.3.0"
 pyyaml = "^6.0.1"
 redis = "^5.0.1"
-fake-useragent = "^1.3.0"
+sqlalchemy = "^2.0.21"
+starlette = "^0.31.1"
+starlette-graphene3 = "^0.6.0"
+uvicorn = "^0.23.2"
+datek-app-utils = "^0.3.5"
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = [
+    "--cov=yggdrasil"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
 
 [tool.poetry.group.dev.dependencies]
-testing-postgresql = "^1.3.0"
+black = "^24.1.1"
+invoke = "^2.2.0"
+gitpython = "^3.1.37"
 pytest = "^7.4.2"
 pytest-asyncio = "^0.21.1"
-invoke = "^2.2.0"
+pytest-cov = "^4.1.0"
 pytest-watch = "^4.2.0"
-gitpython = "^3.1.37"
 semver = "^3.0.1"
 tabulate = "^0.9.0"
 

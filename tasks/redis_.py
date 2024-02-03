@@ -1,14 +1,13 @@
 from invoke import task
 
+from yggdrasil.components.env import EnvConfig
+
 
 def get_redis_client():
     from yggdrasil.components.app_config import load_app_config
-    from yggdrasil.components.env import environment
     import redis
 
-    env = environment()
-
-    config = load_app_config(env.config_file_path)
+    config = load_app_config(EnvConfig.YGGDRASIL_CONFIG_FILE_PATH)
 
     return redis.from_url(config.redis_url)
 
