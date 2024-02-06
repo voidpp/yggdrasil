@@ -11,6 +11,6 @@ class EnvConfig(BaseConfig):
         parts = [
             f"{variable.name}={variable.value}"
             for variable in cls
-        ]
+        ]  # fmt: skip
 
         return "\n".join(parts)

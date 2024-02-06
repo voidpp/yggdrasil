@@ -26,15 +26,6 @@ starlette-graphene3 = "^0.6.0"
 uvicorn = "^0.23.2"
 datek-app-utils = "^0.3.5"
 
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-addopts = [
-    "--cov=yggdrasil"
-]
-filterwarnings = [
-    "ignore::DeprecationWarning"
-]
-
 [tool.poetry.group.dev.dependencies]
 black = "^24.1.1"
 invoke = "^2.2.0"
@@ -45,6 +36,15 @@ pytest-cov = "^4.1.0"
 pytest-watch = "^4.2.0"
 semver = "^3.0.1"
 tabulate = "^0.9.0"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = [
+    "--cov=yggdrasil"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
 
 [build-system]
 requires = ["poetry-core"]

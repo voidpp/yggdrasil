@@ -50,7 +50,9 @@ async def test_create_link(test_client, populator, authenticated_user):
 @pytest.mark.asyncio
 async def test_create_link_without_url(test_client, populator, authenticated_user):
     section_id = await populator.add_section(authenticated_user.id)
-    result = await test_client.query(query, generate_link_vars({"sectionId": section_id, "title": "yey", "type": "SINGLE"}))
+    result = await test_client.query(
+        query, generate_link_vars({"sectionId": section_id, "title": "yey", "type": "SINGLE"})
+    )
     assert result["data"]["saveLink"]["errors"] == []
     links = await populator.list_links(section_ids={section_id})
     assert len(links) == 1

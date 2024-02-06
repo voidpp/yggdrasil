@@ -152,9 +152,11 @@ class NodeBase(Generic[InputType], metaclass=_NodeConfigChecker):
     def field(cls) -> Field:
         return Field(
             type_=cls.config.result_type,
-            args=create_class_property_dict(cls.config.input_validator, sub_type=InputObjectType)
-            if cls.config.input_validator
-            else None,
+            args=(
+                create_class_property_dict(cls.config.input_validator, sub_type=InputObjectType)
+                if cls.config.input_validator
+                else None
+            ),
             resolver=cls._resolve,
             description=cls.config.description,
             **cls.config.field_extra,
