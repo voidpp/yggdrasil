@@ -1,0 +1,39 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install env
+        uses: ./.github/install_python_env
+
+      - name: Lint
+        run: |
+          source .venv/bin/activate
+          black --check yggdrasil/ tests/
+          unimport --check yggdrasil/ tests/
+
+      - name: Test
+        shell: bash
+        env:
+          YGGDRASIL_POSTGRES_HOST: 127.0.0.1
+          YGGDRASIL_POSTGRES_PORT: 5432
+          YGGDRASIL_POSTGRES_USER: user
+          YGGDRASIL_POSTGRES_PASSWORD: password
+          YGGDRASIL_POSTGRES_DB: test
+          YGGDRASIL_DEV_MODE: 1
+        run: |
+          source .venv/bin/activate
+          export YGGDRASIL_CONFIG_FILE_PATH=$PWD/example_config.yaml
+          echo "YGGDRASIL_CONFIG_FILE_PATH=$YGGDRASIL_CONFIG_FILE_PATH"
+          docker compose up -d
+          status=0
+          pytest tests || status=$?
+          docker compose down -v
+          exit $status
