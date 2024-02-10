@@ -17,7 +17,6 @@ class Populator:
         query = insert(section).values({"user_id": user_id, "name": name, "rank": rank}).returning(section.c.id)
 
         result = await self.db_session.execute(query)
-        await self.db_session.commit()
 
         return result.scalar()
 
@@ -46,7 +45,6 @@ class Populator:
         )
 
         result = await self.db_session.execute(query)
-        await self.db_session.commit()
 
         return result.scalar()
 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from sqlalchemy import update, select, func
+from sqlalchemy import update, select
 
 from yggdrasil.api.types import CommonMutationResult, get_auth_error, Error
 from yggdrasil.components.graphene.node_base import NodeBase, NodeConfig, NodeValidationError

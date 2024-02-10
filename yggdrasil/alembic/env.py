@@ -1,23 +1,24 @@
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
+from datek_app_utils.env_config.utils import validate_config
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from yggdrasil.components.app_config import load_app_config
+from yggdrasil.components.env import EnvConfig
 from yggdrasil.db_tables import meta
-from yggdrasil.components.env import environment
-
-from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-env = environment()
-app_config = load_app_config(env.config_file_path)
+validate_config(EnvConfig)
+app_config = load_app_config(EnvConfig.YGGDRASIL_CONFIG_FILE_PATH)
 config.set_main_option("sqlalchemy.url", app_config.database_url)
+
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

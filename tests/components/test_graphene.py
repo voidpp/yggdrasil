@@ -1,6 +1,4 @@
 from typing import Annotated
-
-import pytest
 from graphene import String, List, NonNull
 from pydantic import BaseModel, HttpUrl, StringConstraints
 

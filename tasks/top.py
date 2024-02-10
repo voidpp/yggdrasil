@@ -53,3 +53,25 @@ def generate_next_version(c):
         raise Exception("Only minor and patch bump is implemented right now!")
 
     print(next_version)
+
+
+@task
+def print_parsed_db_url_env_vars(c):
+    from datek_app_utils.env_config.utils import validate_config
+    from urllib.parse import urlparse
+    from yggdrasil.components.app_config import load_app_config
+    from yggdrasil.components.env import EnvConfig
+
+    validate_config(EnvConfig)
+    app_config = load_app_config(EnvConfig.YGGDRASIL_CONFIG_FILE_PATH)
+    parsed_url = urlparse(app_config.database_url)
+
+    parts = [
+        f"YGGDRASIL_POSTGRES_HOST={parsed_url.hostname}",
+        f"YGGDRASIL_POSTGRES_PORT={parsed_url.port or 5432}",
+        f"YGGDRASIL_POSTGRES_USER={parsed_url.username}",
+        f"YGGDRASIL_POSTGRES_PASSWORD={parsed_url.password}",
+        f"YGGDRASIL_POSTGRES_DB={parsed_url.path.removeprefix('/')}",
+    ]
+
+    print("\n".join(parts))

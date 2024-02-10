@@ -1,0 +1,9 @@
+database_url: postgresql+asyncpg://user:password@127.0.0.1:5432/test
+redis_url: redis://localhost:6379/1
+session_secret: asdiuy6asi8d7asbd78a6sbdi6asbi86dbi87a6d
+auth_clients:
+  google:
+    id: RANDOM.apps.googleusercontent.com
+    secret: RANDOM
+    metadata_url: https://accounts.google.com/.well-known/openid-configuration
+    icon: https://freesvg.org/img/1534129544.png
