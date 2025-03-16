@@ -57,8 +57,10 @@ class AuthController:
         return await client.authorize_redirect(request, redirect_uri)
 
     async def redirect(self, request: Request):
+        # TODO: get locale from request accept-language header
         client = self._get_client(request)
         token = await client.authorize_access_token(request)
+        logger.info("Token: %s", token)
         user_info = UserInfo(**token["userinfo"])
         database_session = request.scope[RequestScopeKeys.DATABASE_SESSION]
         await user_info.store(database_session)

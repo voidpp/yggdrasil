@@ -1,7 +1,7 @@
 from datetime import time
 
-import pkg_resources
+import importlib.metadata
 
 
 def app_version(debug: bool) -> str:
-    return str(time()) if debug else pkg_resources.get_distribution("yggdrasil").version
+    return str(time()) if debug else importlib.metadata.version("yggdrasil")

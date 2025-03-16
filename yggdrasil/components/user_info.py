@@ -13,11 +13,12 @@ class UserInfo(BaseModel):
     given_name: str
     family_name: str
     picture: str
-    locale: str
-    id: int = None
+    locale: str | None = None
+    id: int | None = None
 
     @property
     def name(self):
+        # FIXME: we are not getting the locale anymore
         names = [self.family_name, self.given_name]
         if self.locale != "hu":
             names.reverse()

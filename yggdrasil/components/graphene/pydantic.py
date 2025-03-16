@@ -4,6 +4,7 @@ import uuid
 from datetime import date, datetime
 from ipaddress import IPv4Address
 from typing import Tuple, Type, Union, get_args, get_origin, Annotated
+from pydantic import HttpUrl
 
 from graphene import (
     UUID,
@@ -207,4 +208,5 @@ _TYPE_MAP_SCALARS = {
     dict: JSONString,
     IPv4Address: String,
     Url: String,
+    HttpUrl: String,
 }
