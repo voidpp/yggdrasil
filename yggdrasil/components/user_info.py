@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from sqlalchemy import select, update, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from yggdrasil.components.database import Database
 from yggdrasil.db_tables import user
 from yggdrasil.schema import BoardBackgroundType
 

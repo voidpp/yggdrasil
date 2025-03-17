@@ -76,10 +76,13 @@ async def get_earth_porn_images(config: ReditConfig):
         user_agent="Yggdrasil/1.0",  # TODO: get version from app
     )
     subreddit = await reddit.subreddit("earthporn")
-
+    images = []
     async for submission in subreddit.hot(limit=20):
-        yield EarthPornImage(
-            url=submission.url,
-            title=parse_image_title(submission.title).title,
-            id=submission.id,
+        images.append(
+            EarthPornImage(
+                url=submission.url,
+                title=parse_image_title(submission.title).title,
+                id=submission.id,
+            )
         )
+    return images
