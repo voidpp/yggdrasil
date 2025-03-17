@@ -43,7 +43,6 @@ query EarthPornImages {
         id
         url
         title
-        thumbnailUrl
     }
 }
 

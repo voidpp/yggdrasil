@@ -13,5 +13,6 @@ class EarthPornImagesNode(NodeBase):
     )
 
     async def resolve(self):
+        self.request_context.config.reddit
         data = await get_earth_porn_json()
         return get_earth_porn_images(data)

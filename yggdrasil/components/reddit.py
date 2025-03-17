@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from fake_useragent import UserAgent
 from httpx import AsyncClient
 from pydantic import BaseModel
+import asyncpraw
+
+from yggdrasil.components.app_config import ReditConfig
+
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +16,6 @@ logger = logging.getLogger(__name__)
 class EarthPornImage(BaseModel):
     url: str
     title: str
-    thumbnail_url: str
     id: str
 
 
@@ -54,7 +57,7 @@ def parse_image_title(raw_title: str) -> ImageTitleMetadata:
     )
 
 
-def get_earth_porn_images(subreddit_json: dict):
+def get_earth_porn_images_old(subreddit_json: dict):
     return [
         EarthPornImage(
             url=post["data"]["url"],
@@ -64,3 +67,19 @@ def get_earth_porn_images(subreddit_json: dict):
         )
         for post in subreddit_json["data"]["children"]
     ]
+
+
+async def get_earth_porn_images(config: ReditConfig):
+    reddit = asyncpraw.Reddit(
+        client_id=config.client_id,
+        client_secret=config.client_secret,
+        user_agent="Yggdrasil/1.0",  # TODO: get version from app
+    )
+    subreddit = await reddit.subreddit("earthporn")
+
+    async for submission in subreddit.hot(limit=20):
+        yield EarthPornImage(
+            url=submission.url,
+            title=parse_image_title(submission.title).title,
+            id=submission.id,
+        )
